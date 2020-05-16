@@ -281,6 +281,7 @@ Vemos que las variables más correlacionadas con el precio son el peso en kilate
 Para estas dos variables, vamos a estudiar una a una su índice de correlación:
 
 ```{r}
+library(psych)
 pairs.panels(diamonds_df[,c(8,12)], ellipses = FALSE, lm=TRUE, method = "pearson")
 pairs.panels(diamonds_df[,c(8,2)], ellipses = FALSE, lm=TRUE, method = "pearson")
 ```
@@ -330,7 +331,7 @@ Donde, de manera visual, parece dificil establecer relaciones entre el Precio y 
 A continuación, realizamos los tests chi-square para cada una de las tablas, con el fin de comprobar si existe relación.
 
 ```{r}
-chisq.test(cuartil.price$price, diamonds_df$cut)
+chisq.test(cuartil.price, diamonds_df$cut)
 #chisq.test(tbl.clarity)
 #chisq.test(tbl.color)
 ```
@@ -351,7 +352,7 @@ Y vemos que no podemos establecer una relación directa entre el Precio y las va
 ## 6. Resolución  del  problema.  A  partir  de  los  resultados  obtenidos,  ¿cuáles  son  las conclusiones? ¿Los resultados permiten responder al problema? 
 
 
-
+ 
 
 
 

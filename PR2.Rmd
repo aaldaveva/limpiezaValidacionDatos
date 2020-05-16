@@ -358,12 +358,40 @@ cramerV(cuartil.price, diamonds_df$cut)
 cramerV(cuartil.price, diamonds_df$color)
 cramerV(cuartil.price, diamonds_df$clarity)
 ```
+Y vemos que no podemos establecer una relación directa entre el Precio y las variables de Color, Corte y Claridad.
+
 #### 4.3.2. Contraste de Hipótesis
 
 #### 4.3.3. Regrestiones
+````{r}
+modelo1<-lm(price~volume, data=diamonds_df)
+summary(modelo1)
+```
+````{r}
+modelo2<-lm(price~volume+carat, data=diamonds_df)
+summary(modelo2)
+```
+````{r}
+modelo3<-lm(price~volume+carat+clarity, data=diamonds_df)
+summary(modelo3)
+```
+````{r}
+modelo4<-lm(price~carat+volume+clarity+color, data=diamonds_df)
+summary(modelo4)
+```
+Hemos elegido el modelo lineal, ya que consideramos que las mejores variables predictoras son el volumen y el peso, además el color y la apariencia visual ayudarán a ajustar más el modelo. Para conseguir el modelo óptimo, construimos 4 modelos, a los que hemos ido añdiendo más variables hasta conseguir un modelo óptimo.
+En el primer modelo solo correlacionamos el volumen y el precio y el coeficiente de determinación es alto ya que da un 0.81
+En el segundo modelo añadimos el peso y el coeficiente de determinación sube hasta dar un 0.85
+En el tercer modelo utlizamos el peso, volumen y la apariencia visual y el coeficiente de determinación da un 0.89
+Finalmente en el cuarto y último modelo, utilizamos el peso, volumen, la apariencia visual y el color y el coeficiente de determinación da un 0.91. Consideramos que ya es un número bastante alto, además el p-valor es 0, lo que indica que es un buen modelo
+
+###### Como prueba, vamos a intentar predecir el precio de un diamante según sus características
+```{r}
+dfPrueba<- data.frame(carat=2.54,volume=465,clarity='SI2',color='I')
+predict(modelo4,dfPrueba)
+```
 
 
-Y vemos que no podemos establecer una relación directa entre el Precio y las variables de Color, Corte y Claridad.
 
 ## 5. Representación de los resultados a partir de tablas y gráficas. 
 

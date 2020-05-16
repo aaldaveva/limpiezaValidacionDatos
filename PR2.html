@@ -915,13 +915,54 @@ cramerV(cuartil.price, diamonds_df$cut)</code></pre>
 <pre class="r"><code>cramerV(cuartil.price, diamonds_df$clarity)</code></pre>
 <pre><code>## Cramer V 
 ##   0.1846</code></pre>
+<p>Y vemos que no podemos establecer una relación directa entre el Precio y las variables de Color, Corte y Claridad.</p>
 </div>
 <div id="contraste-de-hipótesis" class="section level4">
 <h4>4.3.2. Contraste de Hipótesis</h4>
 </div>
 <div id="regrestiones" class="section level4">
 <h4>4.3.3. Regrestiones</h4>
-<p>Y vemos que no podemos establecer una relación directa entre el Precio y las variables de Color, Corte y Claridad.</p>
+<pre class="r"><code>mPV&lt;-lm(price~volume, data=diamonds_df)
+summary(mPV)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = price ~ volume, data = diamonds_df)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -162792    -780     -86     431   12692 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -2.058e+03  1.422e+01  -144.7   &lt;2e-16 ***
+## volume       4.610e+01  9.373e-02   491.8   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1703 on 53938 degrees of freedom
+## Multiple R-squared:  0.8177, Adjusted R-squared:  0.8177 
+## F-statistic: 2.419e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>mPCV&lt;-lm(price~carat+volume, data=diamonds_df)
+summary(mPCV)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = price ~ carat + volume, data = diamonds_df)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -18521.7   -805.5    -19.5    538.2  12723.8 
+## 
+## Coefficients:
+##              Estimate Std. Error  t value Pr(&gt;|t|)    
+## (Intercept) -2259.766     13.056 -173.087  &lt; 2e-16 ***
+## carat        7243.588     67.841  106.774  &lt; 2e-16 ***
+## volume          3.175      0.411    7.727 1.12e-14 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1548 on 53937 degrees of freedom
+## Multiple R-squared:  0.8495, Adjusted R-squared:  0.8495 
+## F-statistic: 1.522e+05 on 2 and 53937 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 </div>
 </div>

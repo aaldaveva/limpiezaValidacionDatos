@@ -3,8 +3,14 @@ GitHub de la práctica de Limpieza y Validación de los Datos de la asignatura T
 Autores:
 
 Anddy Aldave Valle  github: https://github.com/aaldaveva
-Alejandro Pulido Duque   github: https://github.com/aplusxx
+Alejandro Pulido Duque   github: https://github.com/alexxplus
 
-El objetivo de la práctica consiste en la extracción de las clasificaciones de equipos de fútbol profesional en todas las ligas europeas
+El objetivo de la práctica consiste en la identificación de los datos relevantes para un proyecto analítico y en el uso de herramientas de integración, limpieza, validación y análisis de las mismas.
 
-Para ejecutar el script es necesario instalar la siguientes bibliotecas:
+La práctica la hemos desarrollado en R. Para la correcta ejecución de la misma, se necesita instalar las siguientes librerías:
+- install.packages("VIM")
+- install.packages("reshape2")
+- install.packages("ggplot2")
+- install.packages("psych")
+- install.packages("arules")
+- install.packages("rcompanion")

@@ -34,16 +34,29 @@ A continuación, para mayor claridad, se incluyen las partes del diamante
 
 ## 2. Integración y selección de los datos de interés a analizar. 
 
-
-## 3. Limpieza de los datos.
 ```{r,eval=TRUE,echo=TRUE}
 # Lectura de datos
 diamonds_df <- read.csv("diamonds.csv", header = TRUE, sep=",", dec = ".")
-#sapply(diamonds_df,class)
 #Ejecutando la funcion summary sobre el dataframe, nos mostrará un resumen de cada variable
 summary(diamonds_df)
 str(diamonds_df)
 ```
+##### La lectura del fichero y el resumen de estadísticos de las variables nos muestra que el conjunto de datos consta de 53940 registros y 11 variables o columnas.
+##### La función de importación del fichero csv ha asignado correctamente cada variable con su tipo de datos, los que tienen decimales son números, los que son cualitativos se han importado como factores y el precio es un número entero
+##### De todas ellas la variable X no aporta nada, ya que contiene el número o identificador de registro, por ello, la eliminaremos del conjunto de datos
+```{r,eval=TRUE,echo=TRUE}
+diamonds_df<-diamonds_df[,-1]
+```
+
+Consideramos que necesitamos una variable que contenga el volumen de los diamantes, basándonos en sus medidas x, y, z
+```{r,eval=TRUE,echo=TRUE}
+volume<-diamonds_df$x*diamonds_df$y*diamonds_df$z
+diamonds_df<-cbind(diamonds_df,volume)
+```
+
+
+## 3. Limpieza de los datos.
+
 ### 3.1. ¿Los datos contienen ceros o elementos vacíos? ¿Cómo gestionarías cada uno de estos casos? 
 ```{r,eval=TRUE,echo=TRUE}
 #Comprobamos si hay registros con elementos vacíos o NA
@@ -55,12 +68,13 @@ sapply(diamonds_df, anyNA)
 #Comprobamos si hay registros que contienen ceros
 sapply(diamonds_df, function(x) any(x==0))
 ```
-###### Hemos comprobado que las variables x, y, z contienen ceros
+###### Hemos comprobado que las variables volumen, x, y, z contienen ceros
 
-###### Un diamante es un objeto que debe tener ancho, altura y profundidad, por lo tanto, asumimos que si alguna de estas variables son 0, es que no se ha medido o hay un error en los datos.
+###### Un diamante es un objeto que debe tener ancho, altura y profundidad, por lo tanto, asumimos que si alguna de estas variables son 0, es que no se ha medido o hay un error en los datos. 
 ###### Este tipo de problemas, tiene 2 soluciones: Podríamos eliminar estos registros o calcular un nuevo valor según la semejanza de este registro con otros dentro del mismo conjunto de datos.
 ###### Creemos que eliminar estos registros limitaría nuestro conjunto de datos y ocultaría información que queremos analizar, por ello, imputaremos los valores perdidos a través del modelo basado en los k-vecinos más cercanos. 
 ###### El modelo Knn encuentra los k vecinos más cercanos según la semejanza de los registros perdidos con los demás registros del juego de datos
+###### Solo imputaremos el valor en las variables x, y, z, no tiene sentido aplicar este método a la variable volumen, ya que, es un campo calculado, lo que haremos será que después de calcular los nuevos valores, volveremos a calcular el volumen
 ```{r,eval=TRUE,echo=TRUE}
 suppressWarnings(suppressMessages(library(VIM)))
 library(VIM)
@@ -103,6 +117,10 @@ diamonds_df[indicesz,"z"]<-kNNz[indicesz,"z"]
 ```{r,eval=TRUE,echo=TRUE}
 diamonds_df[indicesz,]
 ```
+###### calculamos nuevamente la variable volumen ya que, esta depende de los valores de x, y, z
+```{r,eval=TRUE,echo=TRUE}
+diamonds_df$volume<-diamonds_df$x*diamonds_df$y*diamonds_df$z
+```
 ###### Finalmente, volvemos a comprobar si hay registros ceros o elementos vacíos
 ```{r,eval=TRUE,echo=TRUE}
 #Comprobamos si hay registros con elementos vacíos o NA
@@ -116,13 +134,7 @@ sapply(diamonds_df, function(x) any(x==0))
 
 ### 3.2 Identificación y tratamiento de valores extremos. 
 
-Calculamos el volumen de los diamantes, basándonos en sus medidas x, y, z
-```{r,eval=TRUE,echo=TRUE}
-volume<-diamonds_df$x*diamonds_df$y*diamonds_df$z
-diamonds_df<-cbind(diamonds_df,volume)
-```
-
-En primer lugar, en esta categoría analizaremos sólo los valores numéricos, para ello, vamos a realizar representaciones de tipo caja de cada una de las variables.
+###### En primer lugar, en esta categoría analizaremos sólo los valores numéricos, para ello, vamos a realizar representaciones de tipo caja de cada una de las variables.
 
 ```{r,eval=TRUE,echo=TRUE}
 #Representamos cada variable
@@ -136,7 +148,7 @@ boxplot(diamonds_df$z, main="Profundidad", xlab="profundidad", ylab="mm")
 boxplot(diamonds_df$volume, main="Volumen", xlab="volumen", ylab="mm^3")
 ```
 
-Observando los datos, vemos que existen datos que, claramente, suponen valores extremos que no difieren bastante de la media de la muestra, analizamos caso a caso.
+###### Observando los datos, vemos que existen datos que, claramente, suponen valores extremos que no difieren bastante de la media de la muestra, analizamos caso a caso.
 
 
 ## 4. Análisis de los datos.
@@ -257,7 +269,7 @@ library (reshape2, warn.conflicts = FALSE)
 library(ggplot2)
 
 #Creamos una matriz de correlación con los datos descritos
-corr.mat<-round(cor(diamonds_df[,c(8,2,6,7,12)], method = "pearson"),2)
+corr.mat<-round(cor(diamonds_df[,c(7,1,5,6,11)], method = "pearson"),2)
 
 #Visualizamos los datos mediante un mapa de calor
 corr.mat[lower.tri(corr.mat)]<- NA
@@ -282,8 +294,8 @@ Para estas dos variables, vamos a estudiar una a una su índice de correlación:
 
 ```{r}
 library(psych)
-pairs.panels(diamonds_df[,c(8,12)], ellipses = FALSE, lm=TRUE, method = "pearson")
-pairs.panels(diamonds_df[,c(8,2)], ellipses = FALSE, lm=TRUE, method = "pearson")
+pairs.panels(diamonds_df[,c(7,11)], ellipses = FALSE, lm=TRUE, method = "pearson")
+pairs.panels(diamonds_df[,c(7,1)], ellipses = FALSE, lm=TRUE, method = "pearson")
 ```
 
 Vemos que la correlación entre el Precio y el Peso, y entre el Precio y su volumen es bastante alta.
@@ -300,6 +312,7 @@ Pero antes, debemos discretizar la variable precio. lo haremos mediante division
 * Tercer cuartil: Alto
 
 ```{r}
+suppressWarnings(suppressMessages(library(arules)))
 library(arules)
 cuartil.price<-discretize(diamonds_df$price, method="frequency",breaks=4,labels=c("Bajo","Medio-Bajo","Medio-Alto","Alto"))
 
@@ -339,11 +352,16 @@ chisq.test(cuartil.price, diamonds_df$cut)
 Alternativa utilizando el método V de Cramer, este método da un valor entre 0 y 1, donde 0 es nada relacionado y 1 totalmente relacionado
 
 ```{r, warning=FALSE}
+suppressWarnings(suppressMessages(library(rcompanion)))
 library(rcompanion)
 cramerV(cuartil.price, diamonds_df$cut)
 cramerV(cuartil.price, diamonds_df$color)
 cramerV(cuartil.price, diamonds_df$clarity)
 ```
+#### 4.3.2. Contraste de Hipótesis
+
+#### 4.3.3. Regrestiones
+
 
 Y vemos que no podemos establecer una relación directa entre el Precio y las variables de Color, Corte y Claridad.
 

@@ -208,22 +208,143 @@ table(diamonds_df$cut)
 
 ```
 
+Siendo estos valores:
+
+* Fair: 1
+* Good: 2
+* Very Good: 3
+* Premium: 4
+* Ideal: 5
 
 ```{r,eval=TRUE,echo=TRUE}
-diamonds_df$cut<-as.numeric(diamonds_df$cut)
+level.cut<-diamonds_df$cut
+level.cut[level.cut="Fair"]<-"1"
+level.cut[level.cut="Good"]<-"2"
+level.cut[level.cut="Very Good"]<-"3"
+level.cut[level.cut="Premium"]<-"4"
+level.cut[level.cut="Ideal"]<-"5"
+level.cut<-as.numeric(level.cut)
 
 #Variable corte
-hist(diamonds_df$cut, main= "Calidad del corte", freq = FALSE, xlab = "Nivel de calidad", col = "dark green", border="white")
-curve(dnorm(x, mean=mean(diamonds_df$cut), sd=sd(diamonds_df$cut)), add=TRUE, col="red", lwd=3)
+hist(level.cut, main= "Calidad del corte", freq = FALSE, xlab = "Nivel de calidad", col = "dark green", border="white")
+#curve(dnorm(x, mean=mean(level.cut), sd=sd(level.cut)), add=TRUE, col="red", lwd=3)
 
 #Test Shapiro
-shapiro.test(diamonds_df$cut[1:5000])
+shapiro.test(level.cut[1:5000])
 
 
 ```
 
 
 ### 4.3.  Aplicación de pruebas estadísticas para comparar los grupos de datos. En función de los datos y el objetivo del estudio, aplicar pruebas de contraste de hipótesis, correlaciones,  regresiones,  etc.  Aplicar  al  menos  tres  métodos  de  análisis diferentes. 
+
+
+#### 4.3.1. Análisis de correlaciones
+
+A continuación, vamos a realizar los análisis de correlaciones, para ello, vamos a utilizar el precio como principal indicador, correlacionando éste con todas las variables, numéricas y categoricas, para las numéricas realizaremos un análisis de correlación Pearson, para las categóricas realizaremos el test chi-square
+
+__Variables Numéricas__
+
+* Precio
+* Peso 
+* Profundidad
+* Tabla
+* Volumen
+
+```{r}
+
+library (reshape2, warn.conflicts = FALSE)
+library(ggplot2)
+
+#Creamos una matriz de correlación con los datos descritos
+corr.mat<-round(cor(diamonds_df[,c(8,2,6,7,12)], method = "pearson"),2)
+
+#Visualizamos los datos mediante un mapa de calor
+corr.mat[lower.tri(corr.mat)]<- NA
+
+m.corr.mat<-melt(corr.mat, na.rm=TRUE)
+
+# Fuente: http://www.sthda.com/english/wiki/ggplot2-quick-correlation-matrix-heatmap-r-software-and-data-visualization
+ggplot(data = m.corr.mat, aes(Var2, Var1, fill = value))+
+ geom_tile(color = "white")+
+ scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+   midpoint = 0, limit = c(-1,1), space = "Lab", 
+   name="Pearson\nCorrelation") +
+  theme_minimal()+ 
+ theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+    size = 12, hjust = 1))+
+ coord_fixed()
+```
+
+Vemos que las variables más correlacionadas con el precio son el peso en kilates y el volumen del diamante.
+
+Para estas dos variables, vamos a estudiar una a una su índice de correlación:
+
+```{r}
+pairs.panels(diamonds_df[,c(8,12)], ellipses = FALSE, lm=TRUE, method = "pearson")
+pairs.panels(diamonds_df[,c(8,2)], ellipses = FALSE, lm=TRUE, method = "pearson")
+```
+
+Vemos que la correlación entre el Precio y el Peso, y entre el Precio y su volumen es bastante alta.
+
+__Variables Categóricas__
+
+A continuación, vamos a realizar un estudio de correlación para variables categóricas utilizando el test chi-square, para ello, en primer lugar, tenemos que crear una tabla de frecuencias de las variables y luego estudiar su relación mediante dicho test.
+
+Pero antes, debemos discretizar la variable precio. lo haremos mediante divisiones en función de la frecuencia, para tener grupos lo más parecidos posibles, tendremos 4 niveles de precio:
+
+* Primer cuartil: Bajo
+* Segundo cuartil: Medio-bajo
+* Tercer cuartil: Medio-alto
+* Tercer cuartil: Alto
+
+```{r}
+library(arules)
+cuartil.price<-discretize(diamonds_df$price, method="frequency",breaks=4,labels=c("Bajo","Medio-Bajo","Medio-Alto","Alto"))
+
+table(cuartil.price)
+
+
+```
+
+Una vez realizada la discretización, procedemos a crear las tablas de contingencia para ver la relación entre el Precio y las variables cualitativas.
+
+```{r}
+#Variable "cut"
+tbl.cut<-table(cuartil.price,diamonds_df$cut)
+tbl.cut
+
+#Variable "Color"
+tbl.color<-table(cuartil.price,diamonds_df$color)
+tbl.color
+
+#Variable "Clarity"
+tbl.clarity<-table(cuartil.price,diamonds_df$clarity)
+tbl.clarity
+
+
+```
+
+Donde, de manera visual, parece dificil establecer relaciones entre el Precio y el resto de las variables.
+
+A continuación, realizamos los tests chi-square para cada una de las tablas, con el fin de comprobar si existe relación.
+
+```{r}
+chisq.test(cuartil.price$price, diamonds_df$cut)
+#chisq.test(tbl.clarity)
+#chisq.test(tbl.color)
+```
+
+Alternativa utilizando el método V de Cramer, este método da un valor entre 0 y 1, donde 0 es nada relacionado y 1 totalmente relacionado
+
+```{r, warning=FALSE}
+library(rcompanion)
+cramerV(cuartil.price, diamonds_df$cut)
+cramerV(cuartil.price, diamonds_df$color)
+cramerV(cuartil.price, diamonds_df$clarity)
+```
+
+Y vemos que no podemos establecer una relación directa entre el Precio y las variables de Color, Corte y Claridad.
 
 ## 5. Representación de los resultados a partir de tablas y gráficas. 
 

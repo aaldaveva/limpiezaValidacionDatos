@@ -1025,7 +1025,7 @@ summary(modelo4)</code></pre>
 ## Residual standard error: 1170 on 53924 degrees of freedom
 ## Multiple R-squared:  0.914,  Adjusted R-squared:  0.914 
 ## F-statistic: 3.822e+04 on 15 and 53924 DF,  p-value: &lt; 2.2e-16</code></pre>
-<p>Hemos elegido el modelo lineal, ya que consideramos que las mejores variables predictoras son el volumen y el peso, además el color y la apariencia visual ayudarán a ajustar más el modelo. Para conseguir el modelo óptimo, construimos 4 modelos, a los que hemos ido añdiendo más variables hasta conseguir un modelo óptimo. En el primer modelo solo correlacionamos el volumen y el precio y el coeficiente de determinación es alto ya que da un 0.81 En el segundo modelo añadimos el peso y el coeficiente de determinación sube hasta dar un 0.85 En el tercer modelo utlizamos el peso, volumen y la apariencia visual y el coeficiente de determinación da un 0.89 Finalmente en el cuarto y último modelo, utilizamos el peso, volumen, la apariencia visual y el color y el coeficiente de determinación da un 0.91. Consideramos que ya es un número bastante alto, además el p-valor es 0, lo que indica que es un buen modelo</p>
+<p>Para conseguir el modelo óptimo, construimos 4 modelos, a los que hemos ido añdiendo más variables hasta conseguir un modelo óptimo. En el primer modelo solo correlacionamos el volumen y el precio y el coeficiente de determinación es alto ya que da un 0.81 En el segundo modelo añadimos el peso y el coeficiente de determinación sube hasta dar un 0.85 En el tercer modelo utlizamos el peso, volumen y la apariencia visual y el coeficiente de determinación da un 0.89 Finalmente en el cuarto y último modelo, utilizamos el peso, volumen, la apariencia visual y el color y el coeficiente de determinación da un 0.91. Consideramos que ya es un número bastante alto, además el p-valor es 0, lo que indica que es un buen modelo</p>
 <div id="como-prueba-vamos-a-intentar-predecir-el-precio-de-un-diamante-según-sus-características" class="section level6">
 <h6>Como prueba, vamos a intentar predecir el precio de un diamante según sus características</h6>
 <pre class="r"><code>dfPrueba&lt;- data.frame(carat=2.54,volume=400,clarity='SI2',color='I')
@@ -1064,7 +1064,7 @@ summary (modelo_logistico_1)</code></pre>
 ## 
 ## Number of Fisher Scoring iterations: 5</code></pre>
 <pre class="r"><code>print(paste0(&quot;Valor OR: &quot;,exp(coefficients(modelo_logistico_1)[2])))</code></pre>
-<pre><code>## [1] &quot;Valor OR: 64.9897247442483&quot;</code></pre>
+<pre><code>## [1] &quot;Valor OR: 64.9897247442484&quot;</code></pre>
 <pre class="r"><code>diamonds_df$VA&lt;-ifelse(diamonds_df$volume&gt;=unname(quantile(diamonds_df$volume,.75)),1,0)
 
 
@@ -1094,9 +1094,9 @@ summary (modelo_logistico_2)</code></pre>
 ## 
 ## Number of Fisher Scoring iterations: 5</code></pre>
 <pre class="r"><code>print(paste0(&quot;Valor OR: &quot;,exp(coefficients(modelo_logistico_2)[2])))</code></pre>
-<pre><code>## [1] &quot;Valor OR: 9.20228865705832&quot;</code></pre>
+<pre><code>## [1] &quot;Valor OR: 9.20228865705824&quot;</code></pre>
 <pre class="r"><code>print(paste0(&quot;Valor OR: &quot;,exp(coefficients(modelo_logistico_2)[3])))</code></pre>
-<pre><code>## [1] &quot;Valor OR: 7.98732688873007&quot;</code></pre>
+<pre><code>## [1] &quot;Valor OR: 7.98732688873012&quot;</code></pre>
 <p>Hemos conseguido reducir el valor de AIC, nuestro modelo ha mejorado. Todas las variables tienen importancia en el modelo. Según el modelo, volumen alto y peso alto producen un precio alto en el diamante, para saber si esta afirmación es correcta, realizaremos el test de holem para saber si el modelo está bien ajustado y por otro lado, miraremos al curca ROC y el área bajo la curva para poder afirmar que el volumen y peso alto producen un precio alto.</p>
 <pre class="r"><code>suppressWarnings(suppressMessages(library(ResourceSelection)))
 library(ResourceSelection)
@@ -1105,7 +1105,7 @@ hoslem.test(diamonds_df$PA, fitted(modelo_logistico_2))</code></pre>
 ##  Hosmer and Lemeshow goodness of fit (GOF) test
 ## 
 ## data:  diamonds_df$PA, fitted(modelo_logistico_2)
-## X-squared = 6.5287e-17, df = 8, p-value = 1</code></pre>
+## X-squared = 6.5285e-17, df = 8, p-value = 1</code></pre>
 <p>El test de Hoslem nos da un p-valor de 1, indica que el modelo está muy bien ajustado</p>
 <pre class="r"><code>suppressWarnings(suppressMessages(library(pROC)))
 

@@ -387,12 +387,59 @@ Finalmente en el cuarto y último modelo, utilizamos el peso, volumen, la aparie
 
 ###### Como prueba, vamos a intentar predecir el precio de un diamante según sus características
 ```{r}
-dfPrueba<- data.frame(carat=2.54,volume=465,clarity='SI2',color='I')
+dfPrueba<- data.frame(carat=2.54,volume=400,clarity='SI2',color='I')
 predict(modelo4,dfPrueba)
+```
+La prueba realizada indica que para un peso de 2.54, volumen de 400, apariencia visual SI2 y color I, el modelo predice que el precio sería de 17.164 dólares.
+
+###### Ahora realizaremos un estudio de regresión logística, intentaremos predecir si el diamante tiene precio alto en función del peso, volumen
+```{r}
+diamonds_df$PA<-ifelse(diamonds_df$price>=unname(quantile(diamonds_df$price,.75)),1,0)
+diamonds_df$CA<-ifelse(diamonds_df$carat>=unname(quantile(diamonds_df$carat,.75)),1,0)
+
+modelo_logistico_1 <- glm(formula=PA~CA , data = diamonds_df, family = "binomial")
+summary (modelo_logistico_1)
+print(paste0("Valor OR: ",exp(coefficients(modelo_logistico_1)[2])))
+```
+
+```{r}
+diamonds_df$VA<-ifelse(diamonds_df$volume>=unname(quantile(diamonds_df$volume,.75)),1,0)
+
+
+modelo_logistico_2 <- glm(formula=PA~CA+VA , data = diamonds_df, family = "binomial")
+summary (modelo_logistico_2)
+print(paste0("Valor OR: ",exp(coefficients(modelo_logistico_2)[2])))
+print(paste0("Valor OR: ",exp(coefficients(modelo_logistico_2)[3])))
+```
+Hemos conseguido reducir el valor de AIC, nuestro modelo ha mejorado. Todas las variables tienen importancia en el modelo.
+Según el modelo, volumen alto y peso alto producen un precio alto en el diamante, para saber si esta afirmación es correcta, realizaremos el test de holem para saber si el modelo está bien ajustado y por otro lado, miraremos al curca ROC y el área bajo la curva para poder afirmar que el volumen y peso alto producen un precio alto.
+
+```{r}
+suppressWarnings(suppressMessages(library(ResourceSelection)))
+library(ResourceSelection)
+hoslem.test(diamonds_df$PA, fitted(modelo_logistico_2))
+```
+El test de Hoslem nos da un p-valor de 1, indica que el modelo está muy bien ajustado
+
+```{r,eval=TRUE, echo=TRUE}
+suppressWarnings(suppressMessages(library(pROC)))
+
+library (pROC)
+prob_p_alto= predict(modelo_logistico_2, diamonds_df, type="response")
+
+g= roc(diamonds_df$PA, prob_p_alto, data=diamonds_df)
+plot (g)
+auc (g)
+
 ```
 
 
-
+El área bajo la curva es de 0.88, es un valor bastante alto. Por lo tanto podemos afirmar que el precio alto está ligado a un volumen alto y peso alto.
+Intentaremos predecir la probabilidad de tener un precio alto, si el peso y el volumen son altos
+```{r,eval=TRUE, echo=TRUE}
+df_2<-data.frame (CA=1,VA=1)
+predict (modelo_logistico_2, df_2 ,type="response")
+```
 ## 5. Representación de los resultados a partir de tablas y gráficas. 
 
 ## 6. Resolución  del  problema.  A  partir  de  los  resultados  obtenidos,  ¿cuáles  son  las conclusiones? ¿Los resultados permiten responder al problema? 

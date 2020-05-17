@@ -922,8 +922,8 @@ cramerV(cuartil.price, diamonds_df$cut)</code></pre>
 </div>
 <div id="regrestiones" class="section level4">
 <h4>4.3.3. Regrestiones</h4>
-<pre class="r"><code>mPV&lt;-lm(price~volume, data=diamonds_df)
-summary(mPV)</code></pre>
+<pre class="r"><code>modelo1&lt;-lm(price~volume, data=diamonds_df)
+summary(modelo1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = price ~ volume, data = diamonds_df)
@@ -942,11 +942,11 @@ summary(mPV)</code></pre>
 ## Residual standard error: 1703 on 53938 degrees of freedom
 ## Multiple R-squared:  0.8177, Adjusted R-squared:  0.8177 
 ## F-statistic: 2.419e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>mPCV&lt;-lm(price~carat+volume, data=diamonds_df)
-summary(mPCV)</code></pre>
+<pre class="r"><code>modelo2&lt;-lm(price~volume+carat, data=diamonds_df)
+summary(modelo2)</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = price ~ carat + volume, data = diamonds_df)
+## lm(formula = price ~ volume + carat, data = diamonds_df)
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
@@ -955,14 +955,176 @@ summary(mPCV)</code></pre>
 ## Coefficients:
 ##              Estimate Std. Error  t value Pr(&gt;|t|)    
 ## (Intercept) -2259.766     13.056 -173.087  &lt; 2e-16 ***
-## carat        7243.588     67.841  106.774  &lt; 2e-16 ***
 ## volume          3.175      0.411    7.727 1.12e-14 ***
+## carat        7243.588     67.841  106.774  &lt; 2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Residual standard error: 1548 on 53937 degrees of freedom
 ## Multiple R-squared:  0.8495, Adjusted R-squared:  0.8495 
 ## F-statistic: 1.522e+05 on 2 and 53937 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>modelo3&lt;-lm(price~volume+carat+clarity, data=diamonds_df)
+summary(modelo3)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = price ~ volume + carat + clarity, data = diamonds_df)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -17318.4   -639.6   -110.1    480.0  11159.1 
+## 
+## Coefficients:
+##               Estimate Std. Error  t value Pr(&gt;|t|)    
+## (Intercept) -6906.8216    50.2143 -137.547  &lt; 2e-16 ***
+## volume          2.0699     0.3435    6.025  1.7e-09 ***
+## carat        8105.3266    56.9751  142.261  &lt; 2e-16 ***
+## clarityIF    5505.1373    57.3619   95.972  &lt; 2e-16 ***
+## claritySI1   3723.4461    49.1556   75.748  &lt; 2e-16 ***
+## claritySI2   2872.6472    49.4683   58.070  &lt; 2e-16 ***
+## clarityVS1   4606.3902    50.1297   91.890  &lt; 2e-16 ***
+## clarityVS2   4382.3745    49.3769   88.754  &lt; 2e-16 ***
+## clarityVVS1  5179.3698    53.0446   97.642  &lt; 2e-16 ***
+## clarityVVS2  5156.0880    51.6183   99.889  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1293 on 53930 degrees of freedom
+## Multiple R-squared:  0.8949, Adjusted R-squared:  0.8949 
+## F-statistic: 5.104e+04 on 9 and 53930 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>modelo4&lt;-lm(price~carat+volume+clarity+color, data=diamonds_df)
+summary(modelo4)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = price ~ carat + volume + clarity + color, data = diamonds_df)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -17277.1   -677.4   -192.5    472.5  10310.0 
+## 
+## Coefficients:
+##               Estimate Std. Error  t value Pr(&gt;|t|)    
+## (Intercept) -6695.4206    47.1908 -141.880  &lt; 2e-16 ***
+## carat        8546.6021    51.7117  165.274  &lt; 2e-16 ***
+## volume          1.9139     0.3108    6.158  7.4e-10 ***
+## clarityIF    5710.7167    52.0021  109.817  &lt; 2e-16 ***
+## claritySI1   3789.8916    44.4909   85.184  &lt; 2e-16 ***
+## claritySI2   2826.6116    44.7675   63.140  &lt; 2e-16 ***
+## clarityVS1   4778.8817    45.3940  105.276  &lt; 2e-16 ***
+## clarityVS2   4460.0146    44.6870   99.806  &lt; 2e-16 ***
+## clarityVVS1  5345.0754    48.0293  111.288  &lt; 2e-16 ***
+## clarityVVS2  5227.4106    46.7194  111.889  &lt; 2e-16 ***
+## colorE       -216.7710    18.5193  -11.705  &lt; 2e-16 ***
+## colorF       -314.8760    18.7151  -16.825  &lt; 2e-16 ***
+## colorG       -508.9292    18.3223  -27.777  &lt; 2e-16 ***
+## colorH       -985.3325    19.4840  -50.571  &lt; 2e-16 ***
+## colorI      -1441.3788    21.8913  -65.842  &lt; 2e-16 ***
+## colorJ      -2340.1862    27.0199  -86.610  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1170 on 53924 degrees of freedom
+## Multiple R-squared:  0.914,  Adjusted R-squared:  0.914 
+## F-statistic: 3.822e+04 on 15 and 53924 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>Hemos elegido el modelo lineal, ya que consideramos que las mejores variables predictoras son el volumen y el peso, además el color y la apariencia visual ayudarán a ajustar más el modelo. Para conseguir el modelo óptimo, construimos 4 modelos, a los que hemos ido añdiendo más variables hasta conseguir un modelo óptimo. En el primer modelo solo correlacionamos el volumen y el precio y el coeficiente de determinación es alto ya que da un 0.81 En el segundo modelo añadimos el peso y el coeficiente de determinación sube hasta dar un 0.85 En el tercer modelo utlizamos el peso, volumen y la apariencia visual y el coeficiente de determinación da un 0.89 Finalmente en el cuarto y último modelo, utilizamos el peso, volumen, la apariencia visual y el color y el coeficiente de determinación da un 0.91. Consideramos que ya es un número bastante alto, además el p-valor es 0, lo que indica que es un buen modelo</p>
+<div id="como-prueba-vamos-a-intentar-predecir-el-precio-de-un-diamante-según-sus-características" class="section level6">
+<h6>Como prueba, vamos a intentar predecir el precio de un diamante según sus características</h6>
+<pre class="r"><code>dfPrueba&lt;- data.frame(carat=2.54,volume=400,clarity='SI2',color='I')
+predict(modelo4,dfPrueba)</code></pre>
+<pre><code>##        1 
+## 17163.75</code></pre>
+<p>La prueba realizada indica que para un peso de 2.54, volumen de 400, apariencia visual SI2 y color I, el modelo predice que el precio sería de 17.164 dólares.</p>
+</div>
+<div id="ahora-realizaremos-un-estudio-de-regresión-logística-intentaremos-predecir-si-el-diamante-tiene-precio-alto-en-función-del-peso-volumen" class="section level6">
+<h6>Ahora realizaremos un estudio de regresión logística, intentaremos predecir si el diamante tiene precio alto en función del peso, volumen</h6>
+<pre class="r"><code>diamonds_df$PA&lt;-ifelse(diamonds_df$price&gt;=unname(quantile(diamonds_df$price,.75)),1,0)
+diamonds_df$CA&lt;-ifelse(diamonds_df$carat&gt;=unname(quantile(diamonds_df$carat,.75)),1,0)
+
+modelo_logistico_1 &lt;- glm(formula=PA~CA , data = diamonds_df, family = &quot;binomial&quot;)
+summary (modelo_logistico_1)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = PA ~ CA, family = &quot;binomial&quot;, data = diamonds_df)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -1.80197  -0.34859  -0.34859  -0.09574   2.37954  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -2.77034    0.02121  -130.6   &lt;2e-16 ***
+## CA           4.17423    0.03009   138.7   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 60665  on 53939  degrees of freedom
+## Residual deviance: 31721  on 53938  degrees of freedom
+## AIC: 31725
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+<pre class="r"><code>print(paste0(&quot;Valor OR: &quot;,exp(coefficients(modelo_logistico_1)[2])))</code></pre>
+<pre><code>## [1] &quot;Valor OR: 64.9897247442483&quot;</code></pre>
+<pre class="r"><code>diamonds_df$VA&lt;-ifelse(diamonds_df$volume&gt;=unname(quantile(diamonds_df$volume,.75)),1,0)
+
+
+modelo_logistico_2 &lt;- glm(formula=PA~CA+VA , data = diamonds_df, family = &quot;binomial&quot;)
+summary (modelo_logistico_2)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = PA ~ CA + VA, family = &quot;binomial&quot;, data = diamonds_df)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.8495  -0.3459  -0.3459  -0.1015   2.3859  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -2.78634    0.02128 -130.93   &lt;2e-16 ***
+## CA           2.21945    0.08532   26.01   &lt;2e-16 ***
+## VA           2.07786    0.08548   24.31   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 60665  on 53939  degrees of freedom
+## Residual deviance: 31150  on 53937  degrees of freedom
+## AIC: 31156
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+<pre class="r"><code>print(paste0(&quot;Valor OR: &quot;,exp(coefficients(modelo_logistico_2)[2])))</code></pre>
+<pre><code>## [1] &quot;Valor OR: 9.20228865705832&quot;</code></pre>
+<pre class="r"><code>print(paste0(&quot;Valor OR: &quot;,exp(coefficients(modelo_logistico_2)[3])))</code></pre>
+<pre><code>## [1] &quot;Valor OR: 7.98732688873007&quot;</code></pre>
+<p>Hemos conseguido reducir el valor de AIC, nuestro modelo ha mejorado. Todas las variables tienen importancia en el modelo. Según el modelo, volumen alto y peso alto producen un precio alto en el diamante, para saber si esta afirmación es correcta, realizaremos el test de holem para saber si el modelo está bien ajustado y por otro lado, miraremos al curca ROC y el área bajo la curva para poder afirmar que el volumen y peso alto producen un precio alto.</p>
+<pre class="r"><code>suppressWarnings(suppressMessages(library(ResourceSelection)))
+library(ResourceSelection)
+hoslem.test(diamonds_df$PA, fitted(modelo_logistico_2))</code></pre>
+<pre><code>## 
+##  Hosmer and Lemeshow goodness of fit (GOF) test
+## 
+## data:  diamonds_df$PA, fitted(modelo_logistico_2)
+## X-squared = 6.5287e-17, df = 8, p-value = 1</code></pre>
+<p>El test de Hoslem nos da un p-valor de 1, indica que el modelo está muy bien ajustado</p>
+<pre class="r"><code>suppressWarnings(suppressMessages(library(pROC)))
+
+library (pROC)
+prob_p_alto= predict(modelo_logistico_2, diamonds_df, type=&quot;response&quot;)
+
+g= roc(diamonds_df$PA, prob_p_alto, data=diamonds_df)</code></pre>
+<pre><code>## Setting levels: control = 0, case = 1</code></pre>
+<pre><code>## Setting direction: controls &lt; cases</code></pre>
+<pre class="r"><code>plot (g)</code></pre>
+<p><img src="data:image/png;base64,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" width="672" /></p>
+<pre class="r"><code>auc (g)</code></pre>
+<pre><code>## Area under the curve: 0.8833</code></pre>
+<p>El área bajo la curva es de 0.88, es un valor bastante alto. Por lo tanto podemos afirmar que el precio alto está ligado a un volumen alto y peso alto. Intentaremos predecir la probabilidad de tener un precio alto, si el peso y el volumen son altos</p>
+<pre class="r"><code>df_2&lt;-data.frame (CA=1,VA=1)
+predict (modelo_logistico_2, df_2 ,type=&quot;response&quot;)</code></pre>
+<pre><code>##         1 
+## 0.8192041</code></pre>
+</div>
 </div>
 </div>
 </div>

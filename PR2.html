@@ -763,9 +763,7 @@ cat(&quot;El precio máximo registrado es: &quot;,preciomax, &quot;\n El volumen
 <h3>4.2. Comprobación de la normalidad y homogeneidad de la varianza.</h3>
 <p>En primer lugar, se realiza un estudio sobre la normalidad de las variables precio, altura, tabla, x, y, z y volumen.</p>
 <p>Se realizará un estudio visual y, a continuación, un test Shapiro (considerado de los más potentes para el contraste de la normalidad).</p>
-<blockquote>
 <p>En el estudio visual se utilizarán histogramas de frecuencias relativas con curva de normalidad superpuesta</p>
-</blockquote>
 <pre class="r"><code>#Variable peso
 hist(diamonds_df$carat, main= &quot;Peso del diamante&quot;, freq = FALSE, xlab = &quot;Kilates&quot;, col = &quot;dark green&quot;, border=&quot;white&quot;)
 curve(dnorm(x, mean=mean(diamonds_df$carat), sd=sd(diamonds_df$carat)), add=TRUE, col=&quot;red&quot;, lwd=3)</code></pre>

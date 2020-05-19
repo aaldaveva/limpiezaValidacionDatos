@@ -238,7 +238,7 @@ En primer lugar, se realiza un estudio sobre la normalidad de las variables prec
 
 Se realizará un estudio visual y, a continuación, un test Shapiro (considerado de los más potentes para el contraste de la normalidad).
 
->En el estudio visual se utilizarán histogramas de frecuencias relativas con curva de normalidad superpuesta
+En el estudio visual se utilizarán histogramas de frecuencias relativas con curva de normalidad superpuesta
 ```{r,eval=TRUE,echo=TRUE}
 #Variable peso
 hist(diamonds_df$carat, main= "Peso del diamante", freq = FALSE, xlab = "Kilates", col = "dark green", border="white")

@@ -57,6 +57,28 @@ diamonds_df<-cbind(diamonds_df,volume)
 
 ## 3. Limpieza de los datos.
 
+Antes de proceder con la evaluación de ceros o elementos vacíos, se va a realizar una limpieza de datos duplicados.
+En primer lugar, veamos si tenemos duplicidades en nuestros datos:
+
+```{r}
+nrow(diamonds_df[duplicated(diamonds_df), ])
+```
+
+Vemos que tenemos 146 registros duplicados, vamos a proceder a su eliminación, ya que para nuestro estudio posterior, podrían alterar los resultados.
+
+```{r, warning=FALSE}
+library(dplyr)
+diamonds_df<-distinct(diamonds_df)
+```
+
+Volvemos a comprobar
+
+```{r}
+nrow(diamonds_df[duplicated(diamonds_df), ])
+```
+
+Ya podríamos continuar con el análisis.
+
 ### 3.1. ¿Los datos contienen ceros o elementos vacíos? ¿Cómo gestionarías cada uno de estos casos? 
 ```{r,eval=TRUE,echo=TRUE}
 #Comprobamos si hay registros con elementos vacíos o NA
@@ -138,17 +160,73 @@ sapply(diamonds_df, function(x) any(x==0))
 
 ```{r,eval=TRUE,echo=TRUE}
 #Representamos cada variable
+par (mfrow= c (1,3))
 boxplot(diamonds_df$carat, main="Peso en Kilates", xlab="peso", ylab="kilates")
 boxplot(diamonds_df$depth, main="Altura del diamante", xlab="altura", ylab="z / media(x, y)")
 boxplot(diamonds_df$table, main="Ancho de la tabla", xlab="tabla", ylab="% respecto al diámetro medio")
+par (mfrow= c (1,3))
 boxplot(diamonds_df$price, main="Precio", xlab="precio", ylab="USD")
 boxplot(diamonds_df$x, main="Longitud", xlab="longitud", ylab="mm")
 boxplot(diamonds_df$y, main="Ancho", xlab="ancho", ylab="mm")
+par (mfrow= c (1,2))
 boxplot(diamonds_df$z, main="Profundidad", xlab="profundidad", ylab="mm")
 boxplot(diamonds_df$volume, main="Volumen", xlab="volumen", ylab="mm^3")
 ```
 
-###### Observando los datos, vemos que existen datos que, claramente, suponen valores extremos que no difieren bastante de la media de la muestra, analizamos caso a caso.
+Observando los datos, vemos que existen datos que, claramente, suponen valores extremos que no difieren bastante de la media de la muestra, analizamos caso a caso.
+
+```{r}
+preciomax<-max(diamonds_df$price)
+volumenmax<-max(diamonds_df$volume)
+cat("El precio máximo registrado es: ",preciomax, "\n El volumen máximo registrado es: ", volumenmax)
+diamonds_df[diamonds_df$price==preciomax,]
+```
+
+Evaluaremos los máximos de la Carat, Precio, "X","Y","Z", Tabla, profundidad y Volumen, ya que, según los gráficos muestran los valores extremos más acusados.
+
+En primer lugar, amos a filtrar por los valores máximos de Peso, tabla, "X", "Y", "Z" y Volumen (variables que, como veremos más adelante, están fuertemenete correlacionadas).
+
+```{r}
+diamonds_df[diamonds_df$carat==max(diamonds_df$carat)|diamonds_df$table==max(diamonds_df$table)|diamonds_df$depth==max(diamonds_df$depth)|diamonds_df$volume==max(diamonds_df$volume)|diamonds_df$x==max(diamonds_df$x)|diamonds_df$y==max(diamonds_df$y)|diamonds_df$z==max(diamonds_df$z),c(1,5,6,7,8,9,10,11)]
+```
+
+Si observamos la tabla anterior, podemos ver que cuando tenemos el precio máximo, el tamaño "x" es el máximo también, y de la misma manera su peso en kilates, lo que tiene sentido.
+Sin embargo, para los otros dos máximos que tenemos para "y" y "z", como podemos observar en la tabla de resultados al filtrar por los correspondientes máximos, no se corresponden a máximos en kilates ni máximos en precio, por tanto, teniendo en cuenta que, al menos las variables peso, "X", "Y", "Z" y volumen (variables físicas relacionadas), no aportan datos coherentes, debemos suponer que los datos son erróneos.
+Además, en el caso de la Profundidad y la tabla, como veremos a continuación, son variables con correlación negativa, esto es, inversamente proporcionales, por tanto, el máximo que encontramos en Profundidad y Tabla tampoco tendrían sentido, observando los datos en su contexto, comparados con el peso, volumen y el precio.
+
+Vamos a continuar analizando las variables Tabla, Profundidad y ancho ("Y"):
+
+```{r}
+library(tidyverse)
+diamonds_df %>% top_n(n=5, y)
+```
+
+En Y, tenemos otro máximo que no tiene ningún sentido, procedemos al borrado.
+
+```{r}
+diamonds_df[diamonds_df$y==31.8, ]
+```
+
+Por otra parte, con el resto de variables no se encuentran más incosistencias.
+
+```{r}
+diamonds_df %>% top_n(n=5, table)
+diamonds_df %>% top_n(n=5, depth)
+```
+
+Por tanto, resumiendo:
+
+* Máximo en Precio y Peso y medida "X": los tres valores corresponden al mismo registro, por tanto, son valores coherentes
+* Máximo en Profundidad y Tabla: El máximo de Profundidad no corresponde con un mínimo de Tabla y viceversa, como veremos, ambas variables son inversamente proporcionales, por tanto, no son valores coherentes, ya que ademas, no se corresponden con máximos de otras variables
+* Maximos en Volumen y medida "y": En este caso tampoco son coherentes ya que no se corresponden con un máximo de Precio y Peso, siendo estas variables áltamente correlacionadas.
+* Maximo en "Z": Tampoco sería coherente, ya que, para ese registro, su volumen es relativamente alto, pero su precio y su peso son mínimos.
+
+Para corregir lo anterior, se van a proceder a borrar los datos que registran máximos incoherentes.
+
+```{r}
+diamonds_df<-diamonds_df[-c(24013, 24876, 48269, 52716, 49048), ]
+```
+
 
 
 ## 4. Análisis de los datos.
@@ -161,38 +239,29 @@ En primer lugar, se realiza un estudio sobre la normalidad de las variables prec
 Se realizará un estudio visual y, a continuación, un test Shapiro (considerado de los más potentes para el contraste de la normalidad).
 
 >En el estudio visual se utilizarán histogramas de frecuencias relativas con curva de normalidad superpuesta
-
 ```{r,eval=TRUE,echo=TRUE}
 #Variable peso
 hist(diamonds_df$carat, main= "Peso del diamante", freq = FALSE, xlab = "Kilates", col = "dark green", border="white")
 curve(dnorm(x, mean=mean(diamonds_df$carat), sd=sd(diamonds_df$carat)), add=TRUE, col="red", lwd=3)
-
 #Variable precio
 hist(diamonds_df$price, main= "Precio del diamante", freq = FALSE, xlab = "Precio USD", col = "dark green", border="white")
-
 #Variable altura
 hist(diamonds_df$depth, main= "Altura del diamante", freq = FALSE, xlab = "z / media(x, y)", col = "dark green", border="white")
 curve(dnorm(x, mean=mean(diamonds_df$depth), sd=sd(diamonds_df$depth)), add=TRUE, col="red", lwd=3)
-
 #Variable ancho
 hist(diamonds_df$table, main= "Ancho del diamante", freq = FALSE, xlab = "% respecto al diámetro medio", col = "dark green", border="white")
 curve(dnorm(x, mean=mean(diamonds_df$table), sd=sd(diamonds_df$table)), add=TRUE, col="red", lwd=3)
-
 #Variable "x"
 hist(diamonds_df$x, main= "Longitud", freq = FALSE, xlab = "mm", col = "dark green", border="white")
-
 #Variable "y"
 hist(diamonds_df$y, main= "Ancho", freq = FALSE, xlab = "mm", col = "dark green", border="white")
 curve(dnorm(x, mean=mean(diamonds_df$y), sd=sd(diamonds_df$y)), add=TRUE, col="red", lwd=3)
-
-#Variable "z"
+#Variable z"
 hist(diamonds_df$z, main= "Profundidad", freq = FALSE, xlab = "mm", col = "dark green", border="white")
 curve(dnorm(x, mean=mean(diamonds_df$z), sd=sd(diamonds_df$z)), add=TRUE, col="red", lwd=3)
-
 #Volumen
 hist(diamonds_df$volume, main= "Volumen", freq = FALSE, xlab = "mm^3", col = "dark green", border="white")
 curve(dnorm(x, mean=mean(diamonds_df$volume), sd=sd(diamonds_df$volume)), add=TRUE, col="red", lwd=3)
-
 ```
 
 Vemos que en el caso del precio seguiría una distribución exponencial negativa, por otra parte, la longitud no seguiría ninguna distribución apreciable.
@@ -217,7 +286,6 @@ Vamos a realizar un estudio de normalidad sobre la variable corte, para ello vam
 
 ```{r}
 table(diamonds_df$cut)
-
 ```
 
 Siendo estos valores:
@@ -236,15 +304,11 @@ level.cut[level.cut="Very Good"]<-"3"
 level.cut[level.cut="Premium"]<-"4"
 level.cut[level.cut="Ideal"]<-"5"
 level.cut<-as.numeric(level.cut)
-
 #Variable corte
 hist(level.cut, main= "Calidad del corte", freq = FALSE, xlab = "Nivel de calidad", col = "dark green", border="white")
 #curve(dnorm(x, mean=mean(level.cut), sd=sd(level.cut)), add=TRUE, col="red", lwd=3)
-
 #Test Shapiro
 shapiro.test(level.cut[1:5000])
-
-
 ```
 
 
@@ -264,16 +328,12 @@ __Variables Numéricas__
 * Volumen
 
 ```{r}
-
 library (reshape2, warn.conflicts = FALSE)
 library(ggplot2)
-
 #Creamos una matriz de correlación con los datos descritos
 corr.mat<-round(cor(diamonds_df[,c(7,1,5,6,11)], method = "pearson"),2)
-
-#Visualizamos los datos mediante un mapa de calor
+#Visualizams los datos mediante un mapa de calor
 corr.mat[lower.tri(corr.mat)]<- NA
-
 m.corr.mat<-melt(corr.mat, na.rm=TRUE)
 
 # Fuente: http://www.sthda.com/english/wiki/ggplot2-quick-correlation-matrix-heatmap-r-software-and-data-visualization
@@ -287,8 +347,8 @@ ggplot(data = m.corr.mat, aes(Var2, Var1, fill = value))+
     size = 12, hjust = 1))+
  coord_fixed()
 ```
-
 Vemos que las variables más correlacionadas con el precio son el peso en kilates y el volumen del diamante.
+Además, un dato importante que podemos observar es que las variables Profundidad y Tabla son inversamente proporcionales, teniendo una correlación negativa.
 
 Para estas dos variables, vamos a estudiar una a una su índice de correlación:
 
@@ -315,10 +375,7 @@ Pero antes, debemos discretizar la variable precio. lo haremos mediante division
 suppressWarnings(suppressMessages(library(arules)))
 library(arules)
 cuartil.price<-discretize(diamonds_df$price, method="frequency",breaks=4,labels=c("Bajo","Medio-Bajo","Medio-Alto","Alto"))
-
 table(cuartil.price)
-
-
 ```
 
 Una vez realizada la discretización, procedemos a crear las tablas de contingencia para ver la relación entre el Precio y las variables cualitativas.
@@ -327,16 +384,12 @@ Una vez realizada la discretización, procedemos a crear las tablas de contingen
 #Variable "cut"
 tbl.cut<-table(cuartil.price,diamonds_df$cut)
 tbl.cut
-
 #Variable "Color"
 tbl.color<-table(cuartil.price,diamonds_df$color)
 tbl.color
-
 #Variable "Clarity"
 tbl.clarity<-table(cuartil.price,diamonds_df$clarity)
 tbl.clarity
-
-
 ```
 
 Donde, de manera visual, parece dificil establecer relaciones entre el Precio y el resto de las variables.
@@ -361,6 +414,56 @@ cramerV(cuartil.price, diamonds_df$clarity)
 Y vemos que no podemos establecer una relación directa entre el Precio y las variables de Color, Corte y Claridad.
 
 #### 4.3.2. Contraste de Hipótesis
+Vamos a investigar si el precio medio de los diamantes con tipo de corte Premium es igual al de tipo de corte Good
+###### Escribimos la hipótesis nula y la hipótesis alternativa
+La Hipótesis nula sería que la esperanza de ambas muestras sean iguales y la Hipótesis alternativa H1 que la esperanza de ambas muestras sea diferente, por lo tanto es bilateral
+Ho: u1=u2
+H1: u1$\neq$u2
+Para poder asumir una normalidad en los datos, las muestran deben ser superiores a 30, por ello, imprimiré el dataset del primer apartado, en el que se mostraba un gráfico según el número de muestras para ambos tipos de corte
+```{r, warning=FALSE}
+#Nivel de significacion
+alpha<-1-0.95
+
+hipdiamonds_df<-diamonds_df[diamonds_df$cut=="Good" | diamonds_df$cut=="Premium", ]
+
+#Datos de Good
+
+dfGood <- diamonds_df[diamonds_df$cut=="Good",]
+nGood <- nrow(dfGood)
+nGood
+
+medGood <- mean(dfGood$ price)
+sdGood <- sd(dfGood$ price)
+
+#Datos de Premium
+dfPremium <- diamonds_df[diamonds_df$cut=="Premium",]
+nPremium <- nrow(dfPremium)
+
+medPremium <- mean(dfPremium$ price)
+sdPremium <- sd(dfPremium$ price)
+
+s<- sqrt(((nGood-1)*sdGood^2+(nPremium-1)*sdPremium^2)/(nGood+nPremium-2))
+s
+
+sx<- s*sqrt(1/nGood + 1/nPremium)
+sx
+
+#Calculo de t
+t<-(medGood-medPremium)/sx
+t
+
+#Calculo el valor crítico
+tcritico<-qt((1-alpha/2),df=nGood+nPremium-2)
+tcritico
+
+#Calculo el pvalue
+pvalue<-2*(1- (pt(abs(t),df=nGood+nPremium-2)))
+pvalue
+
+```
+El valor de pvalue es 0 es muy inferior al nivel de significación, por lo tanto, rechazamos la hipótesis nula, ya que la esperanza del precio medio es diferente entre ambos tipos de corte.
+Con respecto al valor crítico expresa el mismo resultado: el valor crítico es -1.96 hasta 1.96 y el valor del estadístico t es de -9 que está totalmente fuera de este intervalo, estamos muy alejados de la zona de aceptación de la Hipótesis nula.
+Después de ver los resultados, a través del p value y de valor crítico, se deduce que hay diferencias significativas en el precio entre los corte Premium y Good
 
 #### 4.3.3. Regrestiones
 ````{r}
@@ -384,28 +487,23 @@ En el primer modelo solo correlacionamos el volumen y el precio y el coeficiente
 En el segundo modelo añadimos el peso y el coeficiente de determinación sube hasta dar un 0.85
 En el tercer modelo utlizamos el peso, volumen y la apariencia visual y el coeficiente de determinación da un 0.89
 Finalmente en el cuarto y último modelo, utilizamos el peso, volumen, la apariencia visual y el color y el coeficiente de determinación da un 0.91. Consideramos que ya es un número bastante alto, además el p-valor es 0, lo que indica que es un buen modelo
-
-###### Como prueba, vamos a intentar predecir el precio de un diamante según sus características
+Como prueba, vamos a intentar predecir el precio de un diamante según sus características
 ```{r}
 dfPrueba<- data.frame(carat=2.54,volume=400,clarity='SI2',color='I')
 predict(modelo4,dfPrueba)
 ```
-La prueba realizada indica que para un peso de 2.54, volumen de 400, apariencia visual SI2 y color I, el modelo predice que el precio sería de 17.164 dólares.
+La prueba realizada indica que para un peso de 2.54, volumen de 400, apariencia visual SI2 y color I, el modelo predice que el precio sería de 16714.28 dólares.
 
-###### Ahora realizaremos un estudio de regresión logística, intentaremos predecir si el diamante tiene precio alto en función del peso, volumen
+Ahora realizaremos un estudio de regresión logística, intentaremos predecir si el diamante tiene precio alto en función del peso, volumen
 ```{r}
 diamonds_df$PA<-ifelse(diamonds_df$price>=unname(quantile(diamonds_df$price,.75)),1,0)
 diamonds_df$CA<-ifelse(diamonds_df$carat>=unname(quantile(diamonds_df$carat,.75)),1,0)
-
 modelo_logistico_1 <- glm(formula=PA~CA , data = diamonds_df, family = "binomial")
 summary (modelo_logistico_1)
 print(paste0("Valor OR: ",exp(coefficients(modelo_logistico_1)[2])))
 ```
-
 ```{r}
 diamonds_df$VA<-ifelse(diamonds_df$volume>=unname(quantile(diamonds_df$volume,.75)),1,0)
-
-
 modelo_logistico_2 <- glm(formula=PA~CA+VA , data = diamonds_df, family = "binomial")
 summary (modelo_logistico_2)
 print(paste0("Valor OR: ",exp(coefficients(modelo_logistico_2)[2])))
@@ -413,33 +511,28 @@ print(paste0("Valor OR: ",exp(coefficients(modelo_logistico_2)[3])))
 ```
 Hemos conseguido reducir el valor de AIC, nuestro modelo ha mejorado. Todas las variables tienen importancia en el modelo.
 Según el modelo, volumen alto y peso alto producen un precio alto en el diamante, para saber si esta afirmación es correcta, realizaremos el test de holem para saber si el modelo está bien ajustado y por otro lado, miraremos al curca ROC y el área bajo la curva para poder afirmar que el volumen y peso alto producen un precio alto.
-
 ```{r}
 suppressWarnings(suppressMessages(library(ResourceSelection)))
 library(ResourceSelection)
 hoslem.test(diamonds_df$PA, fitted(modelo_logistico_2))
 ```
 El test de Hoslem nos da un p-valor de 1, indica que el modelo está muy bien ajustado
-
 ```{r,eval=TRUE, echo=TRUE}
 suppressWarnings(suppressMessages(library(pROC)))
-
 library (pROC)
 prob_p_alto= predict(modelo_logistico_2, diamonds_df, type="response")
-
 g= roc(diamonds_df$PA, prob_p_alto, data=diamonds_df)
 plot (g)
 auc (g)
-
 ```
-
-
 El área bajo la curva es de 0.88, es un valor bastante alto. Por lo tanto podemos afirmar que el precio alto está ligado a un volumen alto y peso alto.
 Intentaremos predecir la probabilidad de tener un precio alto, si el peso y el volumen son altos
 ```{r,eval=TRUE, echo=TRUE}
 df_2<-data.frame (CA=1,VA=1)
 predict (modelo_logistico_2, df_2 ,type="response")
 ```
+Nos da una probabilidad de un 82% de que si el volumen y el peso son altos, el precio también será alto.
+#### 4.3.4. Árbol de clasificación
 ## 5. Representación de los resultados a partir de tablas y gráficas. 
 
 ## 6. Resolución  del  problema.  A  partir  de  los  resultados  obtenidos,  ¿cuáles  son  las conclusiones? ¿Los resultados permiten responder al problema? 

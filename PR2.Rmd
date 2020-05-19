@@ -13,24 +13,44 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## 1. Descripción del dataset. ¿Por qué es importante y qué pregunta/problema pretende responder?
 
-##### Los campos del conjunto de datos son los siguientes
-###### x: El número de registro
-###### carat: Peso en kilates del diamante
-###### cut: La calidad del corte del diamante
-###### color: El color del diamante
-###### clarity: Califica la apariencia visual de cada diamante
-###### depth: La altura de un diamante, medida desde el culet, o base, hasta la tabla, o tope superior, divido por su diámetro medio (z / media(x, y))
-###### table: El ancho de la tabla del diamante expresado como un porcentaje de su diámetro medio
-###### price: El precio del diamante
-###### x: longitud del diamante en mm
-###### y: ancho del diamante en mm
-###### z: profundidad del diamante en mm
+El dataset "Diamonds" ha sido descargado de Kaggle, cuya licencia es _desconocida_ tal y como indica el mismo.
+
+>Este Set de datos puede ser descargado de: https://www.kaggle.com/shivam2503/diamonds 
+
+El set de datos contiene 53940 registros de diamantes.
+Para cada registro, los campos del conjunto de datos son los siguientes
+* x: El número de registro
+* carat: Peso en kilates del diamante
+* cut: La calidad del corte del diamante
+* color: El color del diamante
+* clarity: Califica la apariencia visual de cada diamante
+* depth: La altura de un diamante, medida desde el culet, o base, hasta la tabla, o tope superior, divido por su diámetro medio (z / media(x, y))
+* table: El ancho de la tabla del diamante expresado como un porcentaje de su diámetro medio
+* price: El precio del diamante
+* x: longitud del diamante en mm
+* y: ancho del diamante en mm
+* z: profundidad del diamante en mm
+
+Además, se añadirá un atributo secundario que facilitará el análisis. Este atributo secundario, calculado a partir de los descritos en la lista, es:
+* Volumen
 
 
-A continuación, para mayor claridad, se incluyen las partes del diamante
+A continuación, para mayor claridad, se incluyen las partes del diamante, que nos ayudará a localizar los atributos de medida (Altura, Tabla, X, Y, Z)
 
 ![Partes del diamante](diamante.JPG)
 
+Resulta interesante desde un punto de vista de la limpieza y el análisis de los datos obtenidos.
+En primer lugar, nos permite ejecutar ciertas tareas de limpieza para adecuar los datos a un posterior análisis exhaustivo de las variables.
+
+La principal pregunta que este análisis intentará responder cómo se relacionan las diferentes características físicas de un diamante entre sí, y qué grado de relacion guardan con el precio de cada uno de esos diamantes.
+
+Las características de los atributos disponibles nos permitirán hacer varios estudios, a destacar:
+* Correlaciones
+* Regresiones de varios tipos
+* Hipótesis
+* Árboles de clasificación
+
+Todos los modelos son característicos del análisis de datos en la Ciencia de Datos, por tanto, la importancia radica en la usabilidad de este dataset y sus aplicaciones prácticas de los modelos anteriormente mencionados.
 
 ## 2. Integración y selección de los datos de interés a analizar. 
 

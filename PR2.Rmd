@@ -553,7 +553,21 @@ predict (modelo_logistico_2, df_2 ,type="response")
 ```
 Nos da una probabilidad de un 82% de que si el volumen y el peso son altos, el precio también será alto.
 
-#### 4.3.4. Árbol de clasificación
+#### 4.3.4. Análisis de multicolinealidad
+
+A continuación, vamos a realizar un estudio sobre la multicolinealidad, siendo ésta, la posible dependencia de unas variables con respecto a otras.
+En este caso, como hemos estudiado, tenemos una fuerte correlación entre las variables peso y volumen, que al tratarse de diamantes de relativa pureza, la relación entre dichas variables no se vería afectada por posibles residuos en los diamantes.
+
+El estudio de multicolinealidad se realiza mediante la raíz cuadrada del resultado de la función "VIF" que encontramos en la librearía "faraway"
+
+```{r}
+library(faraway)
+sqrt(vif(modelo_logistico_2))
+```
+
+Con los datos disponibles, vemos que tenemos cierto grado de multicolinealidad, a pesar de ello, consideramos que, debido a que el volumen lo hemos calculado nosotros, con los datos de X, Y y Z, y dicha variable no tiene en cuenta otros factores, se mantendrá la variable Volumen para los calculos anteriores y posteriores.
+
+#### 4.3.5. Árbol de clasificación
 
 Como hemos observado en las secciones anteriores, tenemos una fuerte correlación entre las variables Precio, peso y volumen, por tanto, vamos a realizar un árbol de clasificación basado en esas variables para intentar predecir la categoría de precio del diamante, para ello, vamos a utilizar las categorías que habíamos descrito en el apartado 4.3.1
 

@@ -19,19 +19,30 @@ El dataset "Diamonds" ha sido descargado de Kaggle, cuya licencia es _desconocid
 
 El set de datos contiene 53940 registros de diamantes.
 Para cada registro, los campos del conjunto de datos son los siguientes
+
 * x: El número de registro
+
 * carat: Peso en kilates del diamante
+
 * cut: La calidad del corte del diamante
+
 * color: El color del diamante
+
 * clarity: Califica la apariencia visual de cada diamante
+
 * depth: La altura de un diamante, medida desde el culet, o base, hasta la tabla, o tope superior, divido por su diámetro medio (z / media(x, y))
 * table: El ancho de la tabla del diamante expresado como un porcentaje de su diámetro medio
+
 * price: El precio del diamante
+
 * x: longitud del diamante en mm
+
 * y: ancho del diamante en mm
+
 * z: profundidad del diamante en mm
 
 Además, se añadirá un atributo secundario que facilitará el análisis. Este atributo secundario, calculado a partir de los descritos en la lista, es:
+
 * Volumen
 
 
@@ -45,12 +56,26 @@ En primer lugar, nos permite ejecutar ciertas tareas de limpieza para adecuar lo
 La principal pregunta que este análisis intentará responder cómo se relacionan las diferentes características físicas de un diamante entre sí, y qué grado de relacion guardan con el precio de cada uno de esos diamantes.
 
 Las características de los atributos disponibles nos permitirán hacer varios estudios, a destacar:
+
 * Correlaciones
+
 * Regresiones de varios tipos
+
 * Hipótesis
+
 * Árboles de clasificación
 
 Todos los modelos son característicos del análisis de datos en la Ciencia de Datos, por tanto, la importancia radica en la usabilidad de este dataset y sus aplicaciones prácticas de los modelos anteriormente mencionados.
+
+
+
+
+
+
+
+
+
+
 
 ## 2. Integración y selección de los datos de interés a analizar. 
 
@@ -180,15 +205,14 @@ sapply(diamonds_df, function(x) any(x==0))
 
 ```{r,eval=TRUE,echo=TRUE}
 #Representamos cada variable
-par (mfrow= c (1,3))
+par (mfrow= c (1,4) )
 boxplot(diamonds_df$carat, main="Peso en Kilates", xlab="peso", ylab="kilates")
 boxplot(diamonds_df$depth, main="Altura del diamante", xlab="altura", ylab="z / media(x, y)")
 boxplot(diamonds_df$table, main="Ancho de la tabla", xlab="tabla", ylab="% respecto al diámetro medio")
-par (mfrow= c (1,3))
 boxplot(diamonds_df$price, main="Precio", xlab="precio", ylab="USD")
+par (mfrow= c (1,4))
 boxplot(diamonds_df$x, main="Longitud", xlab="longitud", ylab="mm")
 boxplot(diamonds_df$y, main="Ancho", xlab="ancho", ylab="mm")
-par (mfrow= c (1,2))
 boxplot(diamonds_df$z, main="Profundidad", xlab="profundidad", ylab="mm")
 boxplot(diamonds_df$volume, main="Volumen", xlab="volumen", ylab="mm^3")
 ```
@@ -204,7 +228,7 @@ diamonds_df[diamonds_df$price==preciomax,]
 
 Evaluaremos los máximos de la Carat, Precio, "X","Y","Z", Tabla, profundidad y Volumen, ya que, según los gráficos muestran los valores extremos más acusados.
 
-En primer lugar, amos a filtrar por los valores máximos de Peso, tabla, "X", "Y", "Z" y Volumen (variables que, como veremos más adelante, están fuertemenete correlacionadas).
+En primer lugar, vamos a filtrar por los valores máximos de Peso, tabla, "X", "Y", "Z" y Volumen (variables que, como veremos más adelante, están fuertemenete correlacionadas).
 
 ```{r}
 diamonds_df[diamonds_df$carat==max(diamonds_df$carat)|diamonds_df$table==max(diamonds_df$table)|diamonds_df$depth==max(diamonds_df$depth)|diamonds_df$volume==max(diamonds_df$volume)|diamonds_df$x==max(diamonds_df$x)|diamonds_df$y==max(diamonds_df$y)|diamonds_df$z==max(diamonds_df$z),c(1,5,6,7,8,9,10,11)]
@@ -217,6 +241,7 @@ Además, en el caso de la Profundidad y la tabla, como veremos a continuación, 
 Vamos a continuar analizando las variables Tabla, Profundidad y ancho ("Y"):
 
 ```{r}
+suppressWarnings(suppressMessages(library(tidyverse)))
 library(tidyverse)
 diamonds_df %>% top_n(n=5, y)
 ```
@@ -251,6 +276,31 @@ diamonds_df<-diamonds_df[-c(24013, 24876, 48269, 52716, 49048), ]
 
 ## 4. Análisis de los datos.
 ### 4.1. Selección de los grupos de datos que se quieren analizar/comparar (planificación de los análisis a aplicar). 
+Vamos a realizar un análisis que responderá cómo están relacionadas las principales características de un diamante.
+
+Las características que analizaremos son:
+
+• El precio 
+
+• El volumen
+
+• Los tipos de corte : Good y Premium
+
+• El color
+
+• La apariencia visual
+
+
+Los estudios y pruebas que realizaremos sobre los atributos disponibles del conjunto de datos serán:
+
+• Correlaciones
+
+• Regresiones de varios tipos
+
+• Hipótesis
+
+• Árboles de clasiﬁcación
+
 
 ### 4.2. Comprobación de la normalidad y homogeneidad de la varianza. 
 
@@ -260,19 +310,26 @@ Se realizará un estudio visual y, a continuación, un test Shapiro (considerado
 
 En el estudio visual se utilizarán histogramas de frecuencias relativas con curva de normalidad superpuesta
 ```{r,eval=TRUE,echo=TRUE}
+par(mfrow=c(2,2))
 #Variable peso
 hist(diamonds_df$carat, main= "Peso del diamante", freq = FALSE, xlab = "Kilates", col = "dark green", border="white")
 curve(dnorm(x, mean=mean(diamonds_df$carat), sd=sd(diamonds_df$carat)), add=TRUE, col="red", lwd=3)
 #Variable precio
 hist(diamonds_df$price, main= "Precio del diamante", freq = FALSE, xlab = "Precio USD", col = "dark green", border="white")
+curve(dnorm(x, mean=mean(diamonds_df$price), sd=sd(diamonds_df$price)), add=TRUE, col="red", lwd=3)
+
 #Variable altura
 hist(diamonds_df$depth, main= "Altura del diamante", freq = FALSE, xlab = "z / media(x, y)", col = "dark green", border="white")
 curve(dnorm(x, mean=mean(diamonds_df$depth), sd=sd(diamonds_df$depth)), add=TRUE, col="red", lwd=3)
 #Variable ancho
 hist(diamonds_df$table, main= "Ancho del diamante", freq = FALSE, xlab = "% respecto al diámetro medio", col = "dark green", border="white")
 curve(dnorm(x, mean=mean(diamonds_df$table), sd=sd(diamonds_df$table)), add=TRUE, col="red", lwd=3)
+
+par(mfrow=c(2,2))
 #Variable "x"
 hist(diamonds_df$x, main= "Longitud", freq = FALSE, xlab = "mm", col = "dark green", border="white")
+curve(dnorm(x, mean=mean(diamonds_df$x), sd=sd(diamonds_df$x)), add=TRUE, col="red", lwd=3)
+
 #Variable "y"
 hist(diamonds_df$y, main= "Ancho", freq = FALSE, xlab = "mm", col = "dark green", border="white")
 curve(dnorm(x, mean=mean(diamonds_df$y), sd=sd(diamonds_df$y)), add=TRUE, col="red", lwd=3)
@@ -435,10 +492,13 @@ Y vemos que no podemos establecer una relación directa entre el Precio y las va
 
 #### 4.3.2. Contraste de Hipótesis
 Vamos a investigar si el precio medio de los diamantes con tipo de corte Premium es igual al de tipo de corte Good
+
 ###### Escribimos la hipótesis nula y la hipótesis alternativa
 La Hipótesis nula sería que la esperanza de ambas muestras sean iguales y la Hipótesis alternativa H1 que la esperanza de ambas muestras sea diferente, por lo tanto es bilateral
+
 Ho: u1=u2
 H1: u1$\neq$u2
+
 Para poder asumir una normalidad en los datos, las muestran deben ser superiores a 30, por ello, imprimiré el dataset del primer apartado, en el que se mostraba un gráfico según el número de muestras para ambos tipos de corte
 ```{r, warning=FALSE}
 #Nivel de significacion
@@ -515,6 +575,7 @@ predict(modelo4,dfPrueba)
 La prueba realizada indica que para un peso de 2.54, volumen de 400, apariencia visual SI2 y color I, el modelo predice que el precio sería de 16714.28 dólares.
 
 Ahora realizaremos un estudio de regresión logística, intentaremos predecir si el diamante tiene precio alto en función del peso, volumen
+En primer lugar reralizaremos un modelo donde tenemos en cuenta el precio alto o no del diamante y también si su peso es alto o no
 ```{r}
 diamonds_df$PA<-ifelse(diamonds_df$price>=unname(quantile(diamonds_df$price,.75)),1,0)
 diamonds_df$CA<-ifelse(diamonds_df$carat>=unname(quantile(diamonds_df$carat,.75)),1,0)
@@ -522,6 +583,7 @@ modelo_logistico_1 <- glm(formula=PA~CA , data = diamonds_df, family = "binomial
 summary (modelo_logistico_1)
 print(paste0("Valor OR: ",exp(coefficients(modelo_logistico_1)[2])))
 ```
+En el segundo modelo añadimos el volumen, de tal forma que ahora nuestro modelo tendrá el peso al to o no y el volumen alto o no para predecir si el precio es alto
 ```{r}
 diamonds_df$VA<-ifelse(diamonds_df$volume>=unname(quantile(diamonds_df$volume,.75)),1,0)
 modelo_logistico_2 <- glm(formula=PA~CA+VA , data = diamonds_df, family = "binomial")

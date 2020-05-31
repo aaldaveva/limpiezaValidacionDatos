@@ -540,12 +540,21 @@ tcritico
 pvalue<-2*(1- (pt(abs(t),df=nGood+nPremium-2)))
 pvalue
 
+#Aplicaré el test Wilcox para verificar que las medias son diferentes 
+
+res <- wilcox.test(dfGood$ price, dfPremium$ price, paired = F)
+res
+res$p.value
+
 ```
 El valor de pvalue es 0 es muy inferior al nivel de significación, por lo tanto, rechazamos la hipótesis nula, ya que la esperanza del precio medio es diferente entre ambos tipos de corte.
 Con respecto al valor crítico expresa el mismo resultado: el valor crítico es -1.96 hasta 1.96 y el valor del estadístico t es de -9 que está totalmente fuera de este intervalo, estamos muy alejados de la zona de aceptación de la Hipótesis nula.
-Después de ver los resultados, a través del p value y de valor crítico, se deduce que hay diferencias significativas en el precio entre los corte Premium y Good
+Después de ver los resultados, a través del p value y de valor crítico, se deduce que hay diferencias significativas en el precio entre los corte Premium y Good.
 
-#### 4.3.3. Regrestiones
+
+Hemos realizado la misma prueba con el test wilcox y nos muestra los mismos datos, al ser el p-value muy inferior al nivel de significancia, se rechaza la hipótesis de que ambas medias sean iguales
+
+#### 4.3.3. Regresiones
 ````{r}
 modelo1<-lm(price~volume, data=diamonds_df)
 summary(modelo1)
@@ -576,6 +585,7 @@ La prueba realizada indica que para un peso de 2.54, volumen de 400, apariencia 
 
 Ahora realizaremos un estudio de regresión logística, intentaremos predecir si el diamante tiene precio alto en función del peso, volumen
 En primer lugar reralizaremos un modelo donde tenemos en cuenta el precio alto o no del diamante y también si su peso es alto o no
+
 ```{r}
 diamonds_df$PA<-ifelse(diamonds_df$price>=unname(quantile(diamonds_df$price,.75)),1,0)
 diamonds_df$CA<-ifelse(diamonds_df$carat>=unname(quantile(diamonds_df$carat,.75)),1,0)
@@ -612,8 +622,19 @@ Intentaremos predecir la probabilidad de tener un precio alto, si el peso y el v
 ```{r,eval=TRUE, echo=TRUE}
 df_2<-data.frame (CA=1,VA=1)
 predict (modelo_logistico_2, df_2 ,type="response")
+
 ```
 Nos da una probabilidad de un 82% de que si el volumen y el peso son altos, el precio también será alto.
+
+Finalmente utilizaremos un modelo de validación cruzada para evaluar si tenemos muchos errores o no en el modelo.
+Para ello, aplicaremos el modelo Leave One Out Cross Validation (LOOCV)
+```{r}
+suppressWarnings(suppressMessages(library(boot)))
+library(boot)
+cv_error <- cv.glm(data = diamonds_df,glmfit = modelo_logistico_2, K=5)
+cv_error$delta 
+```
+El error es muy pequeño, por lo que indica que el modelo es muy bueno
 
 #### 4.3.4. Análisis de multicolinealidad
 

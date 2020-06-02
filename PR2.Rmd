@@ -861,7 +861,7 @@ El problema es que como las variables "Peso" y "Volumen" tenían tanta relación
 Vamos a comprobar la bondad del árbol de clasificación utilizando los datos de test que habíamos reservado y los comparamos con los orignales mediante una matriz de confusión.
 
 ```{r}
-library(caret)
+suppressWarnings(suppressMessages(library(caret)))
 prediccion_1 <- predict(model.tree, newdata = diamonds_test, type = "class")
 
 confusionMatrix(prediccion_1, diamonds_test[["cuartil.price"]])

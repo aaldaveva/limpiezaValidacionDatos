@@ -3,8 +3,8 @@ title: 'Practica 2: Limpieza y validación de los datos'
 author: "Anddy Aldave Valle, Alejandro Pulido Duque"
 date: "13 de mayo de 2020"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -44,7 +44,6 @@ Además, se añadirá un atributo secundario que facilitará el análisis. Este 
 
 * Volumen
 
-
 A continuación, para mayor claridad, se incluyen las partes del diamante, que nos ayudará a localizar los atributos de medida (Altura, Tabla, X, Y, Z)
 
 ![Partes del diamante](diamante.JPG)
@@ -66,7 +65,6 @@ Las características de los atributos disponibles nos permitirán hacer varios e
 
 Todos los modelos son característicos del análisis de datos en la Ciencia de Datos, por tanto, la importancia radica en la usabilidad de este dataset y sus aplicaciones prácticas de los modelos anteriormente mencionados.
 
-
 ## 2. Integración y selección de los datos de interés a analizar. 
 
 ```{r,eval=TRUE,echo=TRUE}
@@ -76,19 +74,23 @@ diamonds_df <- read.csv("diamonds.csv", header = TRUE, sep=",", dec = ".")
 summary(diamonds_df)
 str(diamonds_df)
 ```
-##### La lectura del fichero y el resumen de estadísticos de las variables nos muestra que el conjunto de datos consta de 53940 registros y 11 variables o columnas.
-##### La función de importación del fichero csv ha asignado correctamente cada variable con su tipo de datos, los que tienen decimales son números, los que son cualitativos se han importado como factores y el precio es un número entero
-##### De todas ellas la variable X no aporta nada, ya que contiene el número o identificador de registro, por ello, la eliminaremos del conjunto de datos
+
+La lectura del fichero y el resumen de estadísticos de las variables nos muestra que el conjunto de datos consta de 53940 registros y 11 variables o columnas.
+
+La función de importación del fichero csv ha asignado correctamente cada variable con su tipo de datos, los que tienen decimales son números, los que son cualitativos se han importado como factores y el precio es un número entero
+
+De todas ellas la variable X no aporta nada, ya que contiene el número o identificador de registro, por ello, la eliminaremos del conjunto de datos
+
 ```{r,eval=TRUE,echo=TRUE}
 diamonds_df<-diamonds_df[,-1]
 ```
 
 Consideramos que necesitamos una variable que contenga el volumen de los diamantes, basándonos en sus medidas x, y, z
+
 ```{r,eval=TRUE,echo=TRUE}
 volume<-diamonds_df$x*diamonds_df$y*diamonds_df$z
 diamonds_df<-cbind(diamonds_df,volume)
 ```
-
 
 ## 3. Limpieza de los datos.
 
@@ -115,23 +117,31 @@ nrow(diamonds_df[duplicated(diamonds_df), ])
 Ya podríamos continuar con el análisis.
 
 ### 3.1. ¿Los datos contienen ceros o elementos vacíos? ¿Cómo gestionarías cada uno de estos casos? 
+
 ```{r,eval=TRUE,echo=TRUE}
 #Comprobamos si hay registros con elementos vacíos o NA
 sapply(diamonds_df, anyNA)
 ```
-###### Hemos comprobado que no hay ningún registro con elementos vacíos
+
+Hemos comprobado que no hay ningún registro con elementos vacíos
 
 ```{r,eval=TRUE,echo=TRUE}
 #Comprobamos si hay registros que contienen ceros
 sapply(diamonds_df, function(x) any(x==0))
 ```
-###### Hemos comprobado que las variables volumen, x, y, z contienen ceros
 
-###### Un diamante es un objeto que debe tener ancho, altura y profundidad, por lo tanto, asumimos que si alguna de estas variables son 0, es que no se ha medido o hay un error en los datos. 
-###### Este tipo de problemas, tiene 2 soluciones: Podríamos eliminar estos registros o calcular un nuevo valor según la semejanza de este registro con otros dentro del mismo conjunto de datos.
-###### Creemos que eliminar estos registros limitaría nuestro conjunto de datos y ocultaría información que queremos analizar, por ello, imputaremos los valores perdidos a través del modelo basado en los k-vecinos más cercanos. 
-###### El modelo Knn encuentra los k vecinos más cercanos según la semejanza de los registros perdidos con los demás registros del juego de datos
-###### Solo imputaremos el valor en las variables x, y, z, no tiene sentido aplicar este método a la variable volumen, ya que, es un campo calculado, lo que haremos será que después de calcular los nuevos valores, volveremos a calcular el volumen
+Hemos comprobado que las variables volumen, x, y, z contienen ceros
+
+Un diamante es un objeto que debe tener ancho, altura y profundidad, por lo tanto, asumimos que si alguna de estas variables son 0, es que no se ha medido o hay un error en los datos. 
+
+Este tipo de problemas, tiene 2 soluciones: Podríamos eliminar estos registros o calcular un nuevo valor según la semejanza de este registro con otros dentro del mismo conjunto de datos.
+
+Creemos que eliminar estos registros limitaría nuestro conjunto de datos y ocultaría información que queremos analizar, por ello, imputaremos los valores perdidos a través del modelo basado en los k-vecinos más cercanos. 
+
+El modelo Knn encuentra los k vecinos más cercanos según la semejanza de los registros perdidos con los demás registros del juego de datos.
+
+Solo imputaremos el valor en las variables x, y, z, no tiene sentido aplicar este método a la variable volumen, ya que, es un campo calculado, lo que haremos será que después de calcular los nuevos valores, volveremos a calcular el volumen.
+
 ```{r,eval=TRUE,echo=TRUE}
 suppressWarnings(suppressMessages(library(VIM)))
 library(VIM)
@@ -144,41 +154,57 @@ diamonds_df[indicesx,"x"]<-NA
 diamonds_df[indicesy,"y"]<-NA
 diamonds_df[indicesz,"z"]<-NA
 ```
-###### Miramos el estado de los registros que contienen ceros en la variable x, antes de la imputación
+
+Miramos el estado de los registros que contienen ceros en la variable x, antes de la imputación
+
 ```{r,eval=TRUE,echo=TRUE}
 diamonds_df[indicesx,]
 kNNx<-kNN(diamonds_df[,c("cut","color","clarity","depth","table","price","x","y","z")], variable="x",k=3)
 diamonds_df[indicesx,"x"]<-kNNx[indicesx,"x"]
 ```
-###### Después de la imputación en la variable x
+
+Después de la imputación en la variable x
+
 ```{r,eval=TRUE,echo=TRUE}
 diamonds_df[indicesx,]
 ```
-###### Miramos el estado de los registros que contienen ceros en la variable y, antes de la imputación
+
+Miramos el estado de los registros que contienen ceros en la variable y, antes de la imputación
+
 ```{r,eval=TRUE,echo=TRUE}
 diamonds_df[indicesy,]
 kNNy<-kNN(diamonds_df[,c("cut","color","clarity","depth","table","price","x","y","z")], variable="y",k=3)
 diamonds_df[indicesy,"y"]<-kNNy[indicesy,"y"]
 ```
-###### Después de la imputación en la variable y
+
+Después de la imputación en la variable y
+
 ```{r,eval=TRUE,echo=TRUE}
 diamonds_df[indicesy,]
 ```
-###### Miramos el estado de los registros que contienen ceros en la variable z, antes de la imputación
+
+Miramos el estado de los registros que contienen ceros en la variable z, antes de la imputación
+
 ```{r,eval=TRUE,echo=TRUE}
 diamonds_df[indicesz,]
 kNNz<-kNN(diamonds_df[,c("cut","color","clarity","depth","table","price","x","y","z")], variable="z",k=3)
 diamonds_df[indicesz,"z"]<-kNNz[indicesz,"z"]
 ```
-###### Después de la imputación en la variable z
+
+Después de la imputación en la variable z
+
 ```{r,eval=TRUE,echo=TRUE}
 diamonds_df[indicesz,]
 ```
-###### calculamos nuevamente la variable volumen ya que, esta depende de los valores de x, y, z
+
+calculamos nuevamente la variable volumen ya que, esta depende de los valores de x, y, z
+
 ```{r,eval=TRUE,echo=TRUE}
 diamonds_df$volume<-diamonds_df$x*diamonds_df$y*diamonds_df$z
 ```
-###### Finalmente, volvemos a comprobar si hay registros ceros o elementos vacíos
+
+Finalmente, volvemos a comprobar si hay registros ceros o elementos vacíos
+
 ```{r,eval=TRUE,echo=TRUE}
 #Comprobamos si hay registros con elementos vacíos o NA
 sapply(diamonds_df, anyNA)
@@ -187,11 +213,12 @@ sapply(diamonds_df, anyNA)
 #Comprobamos si hay registros que contienen ceros
 sapply(diamonds_df, function(x) any(x==0))
 ```
-###### Efectivamente, ya no hay ningún valor cero ni elementos vacío
+
+Efectivamente, ya no hay ningún valor cero ni elementos vacío
 
 ### 3.2 Identificación y tratamiento de valores extremos. 
 
-###### En primer lugar, en esta categoría analizaremos sólo los valores numéricos, para ello, vamos a realizar representaciones de tipo caja de cada una de las variables.
+En primer lugar, en esta categoría analizaremos sólo los valores numéricos, para ello, vamos a realizar representaciones de tipo caja de cada una de las variables.
 
 ```{r,eval=TRUE,echo=TRUE}
 #Representamos cada variable
@@ -262,10 +289,10 @@ Para corregir lo anterior, se van a proceder a borrar los datos que registran m�
 diamonds_df<-diamonds_df[-c(24013, 24876, 48269, 52716, 49048), ]
 ```
 
-
-
 ## 4. Análisis de los datos.
+
 ### 4.1. Selección de los grupos de datos que se quieren analizar/comparar (planificación de los análisis a aplicar). 
+
 Vamos a realizar un análisis que responderá cómo están relacionadas las principales características de un diamante.
 
 Las características que analizaremos son:
@@ -280,7 +307,6 @@ Las características que analizaremos son:
 
 • La apariencia visual
 
-
 Los estudios y pruebas que realizaremos sobre los atributos disponibles del conjunto de datos serán:
 
 • Correlaciones
@@ -291,7 +317,6 @@ Los estudios y pruebas que realizaremos sobre los atributos disponibles del conj
 
 • Árboles de clasiﬁcación
 
-
 ### 4.2. Comprobación de la normalidad y homogeneidad de la varianza. 
 
 #### 4.2.1. Normalidad en variables numéricas
@@ -301,6 +326,7 @@ En primer lugar, se realiza un estudio sobre la normalidad de las variables prec
 Se realizará un estudio visual y, a continuación, un test Shapiro (considerado de los más potentes para el contraste de la normalidad).
 
 En el estudio visual se utilizarán histogramas de frecuencias relativas con curva de normalidad superpuesta
+
 ```{r,eval=TRUE,echo=TRUE}
 par(mfrow=c(2,2))
 #Variable peso
@@ -500,7 +526,6 @@ Y seguimos sin tener homocedasticidad
 
 ### 4.3.  Aplicación de pruebas estadísticas para comparar los grupos de datos. En función de los datos y el objetivo del estudio, aplicar pruebas de contraste de hipótesis, correlaciones,  regresiones,  etc.  Aplicar  al  menos  tres  métodos  de  análisis diferentes. 
 
-
 #### 4.3.1. Análisis de correlaciones
 
 Procedemos con los análisis de correlaciones, para ello, vamos a utilizar el precio como principal indicador, correlacionando éste con todas las variables, numéricas y categoricas, para las numéricas realizaremos un análisis de correlación para distribuciones no normales.
@@ -559,32 +584,35 @@ __Kendall Tau__
 
 Del mismo modo que la Spearman, la correlación de Kendall-Tau se basa en rangos.
 
-```{r}
-library (reshape2, warn.conflicts = FALSE)
-library(ggplot2)
-#Creamos una matriz de correlación con los datos descritos
-corr.mat<-round(cor(diamonds_df[,c(7,1,5,6,11)], method = "kendall"),2)
-#Visualizams los datos mediante un mapa de calor
-corr.mat[lower.tri(corr.mat)]<- NA
-m.corr.mat<-melt(corr.mat, na.rm=TRUE)
-# Fuente: http://www.sthda.com/english/wiki/ggplot2-quick-correlation-matrix-heatmap-r-software-and-data-visualization
-ggplot(data = m.corr.mat, aes(Var2, Var1, fill = value))+
- geom_tile(color = "white")+
- scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
-   midpoint = 0, limit = c(-1,1), space = "Lab", 
-   name="Pearson\nCorrelation") +
-  theme_minimal()+ 
- theme(axis.text.x = element_text(angle = 45, vjust = 1, 
-    size = 12, hjust = 1))+
- coord_fixed()
-```
+# Descomentar para generar el PDF y el HTML, luego volver a comentar!
+# ```{r}
+# library (reshape2, warn.conflicts = FALSE)
+# library(ggplot2)
+# #Creamos una matriz de correlación con los datos descritos
+# corr.mat<-round(cor(diamonds_df[,c(7,1,5,6,11)], method = "kendall"),2)
+# #Visualizams los datos mediante un mapa de calor
+# corr.mat[lower.tri(corr.mat)]<- NA
+# m.corr.mat<-melt(corr.mat, na.rm=TRUE)
+# # Fuente: http://www.sthda.com/english/wiki/ggplot2-quick-correlation-matrix-heatmap-r-software-and-data-visualization
+# ggplot(data = m.corr.mat, aes(Var2, Var1, fill = value))+
+#  geom_tile(color = "white")+
+#  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+#    midpoint = 0, limit = c(-1,1), space = "Lab", 
+#    name="Pearson\nCorrelation") +
+#   theme_minimal()+ 
+#  theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+#     size = 12, hjust = 1))+
+#  coord_fixed()
+# ```
 
-```{r}
-library(psych)
-pairs.panels(diamonds_df[,c(7,11)], ellipses = FALSE, lm=TRUE, method = "kendall")
-pairs.panels(diamonds_df[,c(7,1)], ellipses = FALSE, lm=TRUE, method = "kendall")
-pairs.panels(diamonds_df[,c(11,1)], ellipses = FALSE, lm=TRUE, method = "kendall")
-```
+Vemos su índice de correlación
+ 
+# ```{r}
+# library(psych)
+# pairs.panels(diamonds_df[,c(7,11)], ellipses = FALSE, lm=TRUE, method = "kendall")
+# pairs.panels(diamonds_df[,c(7,1)], ellipses = FALSE, lm=TRUE, method = "kendall")
+# pairs.panels(diamonds_df[,c(11,1)], ellipses = FALSE, lm=TRUE, method = "kendall")
+# ```
 
 Obteniendo básicamente los mismos resultados para los dos análisis:
 
@@ -672,17 +700,19 @@ kruskal.test(carat~cut, data = diamonds_df)
 
 Por tanto, para todas las variables categóricas, podemos descartar relaciones entre ellas, así como posibles relaciones con el precio o el peso.
 
-
 #### 4.3.2. Contraste de Hipótesis
+
 Vamos a investigar si el precio medio de los diamantes con tipo de corte Premium es igual al de tipo de corte Good
 
 ###### Escribimos la hipótesis nula y la hipótesis alternativa
+
 La Hipótesis nula sería que la esperanza de ambas muestras sean iguales y la Hipótesis alternativa H1 que la esperanza de ambas muestras sea diferente, por lo tanto es bilateral
 
 Ho: u1=u2
 H1: u1$\neq$u2
 
 Para poder asumir una normalidad en los datos, las muestran deben ser superiores a 30, por ello, imprimiré el dataset del primer apartado, en el que se mostraba un gráfico según el número de muestras para ambos tipos de corte
+
 ```{r, warning=FALSE}
 #Nivel de significacion
 alpha<-1-0.95
@@ -716,14 +746,15 @@ res <- wilcox.test(dfGood$ price, dfPremium$ price, paired = F)
 res
 res$p.value
 ```
+
 El valor de pvalue es 0 es muy inferior al nivel de significación, por lo tanto, rechazamos la hipótesis nula, ya que la esperanza del precio medio es diferente entre ambos tipos de corte.
 Con respecto al valor crítico expresa el mismo resultado: el valor crítico es -1.96 hasta 1.96 y el valor del estadístico t es de -9 que está totalmente fuera de este intervalo, estamos muy alejados de la zona de aceptación de la Hipótesis nula.
 Después de ver los resultados, a través del p value y de valor crítico, se deduce que hay diferencias significativas en el precio entre los corte Premium y Good.
 
-
 Hemos realizado la misma prueba con el test wilcox y nos muestra los mismos datos, al ser el p-value muy inferior al nivel de significancia, se rechaza la hipótesis de que ambas medias sean iguales
 
 #### 4.3.3. Regresiones
+
 ````{r}
 modelo1<-lm(price~volume, data=diamonds_df)
 summary(modelo1)
@@ -740,19 +771,25 @@ summary(modelo3)
 modelo4<-lm(price~carat+volume+clarity+color, data=diamonds_df)
 summary(modelo4)
 ```
+
 Para conseguir el modelo óptimo, construimos 4 modelos, a los que hemos ido añdiendo más variables hasta conseguir un modelo óptimo.
 En el primer modelo solo correlacionamos el volumen y el precio y el coeficiente de determinación es alto ya que da un 0.81
 En el segundo modelo añadimos el peso y el coeficiente de determinación sube hasta dar un 0.85
 En el tercer modelo utlizamos el peso, volumen y la apariencia visual y el coeficiente de determinación da un 0.89
 Finalmente en el cuarto y último modelo, utilizamos el peso, volumen, la apariencia visual y el color y el coeficiente de determinación da un 0.91. Consideramos que ya es un número bastante alto, además el p-valor es 0, lo que indica que es un buen modelo
+
 Como prueba, vamos a intentar predecir el precio de un diamante según sus características
+
 ```{r}
 dfPrueba<- data.frame(carat=2.54,volume=400,clarity='SI2',color='I')
 predict(modelo4,dfPrueba)
 ```
+
 La prueba realizada indica que para un peso de 2.54, volumen de 400, apariencia visual SI2 y color I, el modelo predice que el precio sería de 16714.28 dólares.
+
 Ahora realizaremos un estudio de regresión logística, intentaremos predecir si el diamante tiene precio alto en función del peso, volumen
 En primer lugar reralizaremos un modelo donde tenemos en cuenta el precio alto o no del diamante y también si su peso es alto o no
+
 ```{r}
 diamonds_df$PA<-ifelse(diamonds_df$price>=unname(quantile(diamonds_df$price,.75)),1,0)
 diamonds_df$CA<-ifelse(diamonds_df$carat>=unname(quantile(diamonds_df$carat,.75)),1,0)
@@ -760,7 +797,9 @@ modelo_logistico_1 <- glm(formula=PA~CA , data = diamonds_df, family = "binomial
 summary (modelo_logistico_1)
 print(paste0("Valor OR: ",exp(coefficients(modelo_logistico_1)[2])))
 ```
+
 En el segundo modelo añadimos el volumen, de tal forma que ahora nuestro modelo tendrá el peso al to o no y el volumen alto o no para predecir si el precio es alto
+
 ```{r}
 diamonds_df$VA<-ifelse(diamonds_df$volume>=unname(quantile(diamonds_df$volume,.75)),1,0)
 modelo_logistico_2 <- glm(formula=PA~CA+VA , data = diamonds_df, family = "binomial")
@@ -768,14 +807,18 @@ summary (modelo_logistico_2)
 print(paste0("Valor OR: ",exp(coefficients(modelo_logistico_2)[2])))
 print(paste0("Valor OR: ",exp(coefficients(modelo_logistico_2)[3])))
 ```
+
 Hemos conseguido reducir el valor de AIC, nuestro modelo ha mejorado. Todas las variables tienen importancia en el modelo.
 Según el modelo, volumen alto y peso alto producen un precio alto en el diamante, para saber si esta afirmación es correcta, realizaremos el test de holem para saber si el modelo está bien ajustado y por otro lado, miraremos al curca ROC y el área bajo la curva para poder afirmar que el volumen y peso alto producen un precio alto.
+
 ```{r}
 suppressWarnings(suppressMessages(library(ResourceSelection)))
 library(ResourceSelection)
 hoslem.test(diamonds_df$PA, fitted(modelo_logistico_2))
 ```
+
 El test de Hoslem nos da un p-valor de 1, indica que el modelo está muy bien ajustado
+
 ```{r,eval=TRUE, echo=TRUE}
 suppressWarnings(suppressMessages(library(pROC)))
 library (pROC)
@@ -784,32 +827,40 @@ g= roc(diamonds_df$PA, prob_p_alto, data=diamonds_df)
 plot (g)
 auc (g)
 ```
+
 El área bajo la curva es de 0.88, es un valor bastante alto. Por lo tanto podemos afirmar que el precio alto está ligado a un volumen alto y peso alto.
 Intentaremos predecir la probabilidad de tener un precio alto, si el peso y el volumen son altos
+
 ```{r,eval=TRUE, echo=TRUE}
 df_2<-data.frame (CA=1,VA=1)
 predict (modelo_logistico_2, df_2 ,type="response")
 ```
+
 Nos da una probabilidad de un 82% de que si el volumen y el peso son altos, el precio también será alto.
 Finalmente utilizaremos un modelo de validación cruzada para evaluar si tenemos muchos errores o no en el modelo.
 Para ello, aplicaremos el modelo Leave One Out Cross Validation (LOOCV)
+
 ```{r}
 suppressWarnings(suppressMessages(library(boot)))
 library(boot)
 cv_error <- cv.glm(data = diamonds_df,glmfit = modelo_logistico_2, K=5)
 cv_error$delta 
 ```
+
 El error es muy pequeño, por lo que indica que el modelo es muy bueno
 
 #### 4.3.4. Análisis de multicolinealidad
 
 A continuación, vamos a realizar un estudio sobre la multicolinealidad, siendo ésta, la posible dependencia de unas variables con respecto a otras.
 En este caso, como hemos estudiado, tenemos una fuerte correlación entre las variables peso y volumen, que al tratarse de diamantes de relativa pureza, la relación entre dichas variables no se vería afectada por posibles residuos en los diamantes.
+
 El estudio de multicolinealidad se realiza mediante la raíz cuadrada del resultado de la función "VIF" que encontramos en la librearía "faraway"
+
 ```{r}
 suppressWarnings(suppressMessages(library(faraway)))
 sqrt(vif(modelo_logistico_2))
 ```
+
 Con los datos disponibles, vemos que tenemos cierto grado de multicolinealidad, a pesar de ello, consideramos que, debido a que el volumen lo hemos calculado nosotros, con los datos de X, Y y Z, y dicha variable no tiene en cuenta otros factores, se mantendrá la variable Volumen para los calculos anteriores y posteriores.
 
 #### 4.3.5. Árbol de clasificación
@@ -858,7 +909,7 @@ prediccion_1 <- predict(model.tree, newdata = diamonds_test, type = "class")
 confusionMatrix(prediccion_1, diamonds_test[["cuartil.price"]])
 ```
 
-Podemos observar que tenemos muy buenos valores de "Accuracy" y "Kappa"
+Podemos observar que tenemos muy buenos valores de "Accuracy" y "Kappa".
 
 ## 5. Representación de los resultados a partir de tablas y gráficas. 
 

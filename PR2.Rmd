@@ -758,18 +758,28 @@ Hemos realizado la misma prueba con el test wilcox y nos muestra los mismos dato
 ````{r}
 modelo1<-lm(price~volume, data=diamonds_df)
 summary(modelo1)
+ds1 <- data.frame(variables="volume", r_squared=summary(modelo1)$r.squared)
+
 ```
 ````{r}
 modelo2<-lm(price~volume+carat, data=diamonds_df)
 summary(modelo2)
+ds2 <- data.frame(variables="volume+carat", r_squared=summary(modelo2)$r.squared)
 ```
 ````{r}
 modelo3<-lm(price~volume+carat+clarity, data=diamonds_df)
 summary(modelo3)
+ds3 <- data.frame(variables="volume+carat+clarity", r_squared=summary(modelo3)$r.squared)
 ```
 ````{r}
 modelo4<-lm(price~carat+volume+clarity+color, data=diamonds_df)
 summary(modelo4)
+ds4 <- data.frame(variables="volume+carat+clarity+color", r_squared=summary(modelo4)$r.squared)
+
+modelos_text <- rbind(ds1, ds2)
+modelos_text <- rbind(modelos_text, ds3)
+modelos_text <- rbind(modelos_text, ds4)
+
 ```
 
 Para conseguir el modelo óptimo, construimos 4 modelos, a los que hemos ido añdiendo más variables hasta conseguir un modelo óptimo.
@@ -811,24 +821,7 @@ print(paste0("Valor OR: ",exp(coefficients(modelo_logistico_2)[3])))
 Hemos conseguido reducir el valor de AIC, nuestro modelo ha mejorado. Todas las variables tienen importancia en el modelo.
 Según el modelo, volumen alto y peso alto producen un precio alto en el diamante, para saber si esta afirmación es correcta, realizaremos el test de holem para saber si el modelo está bien ajustado y por otro lado, miraremos al curca ROC y el área bajo la curva para poder afirmar que el volumen y peso alto producen un precio alto.
 
-```{r}
-suppressWarnings(suppressMessages(library(ResourceSelection)))
-library(ResourceSelection)
-hoslem.test(diamonds_df$PA, fitted(modelo_logistico_2))
-```
 
-El test de Hoslem nos da un p-valor de 1, indica que el modelo está muy bien ajustado
-
-```{r,eval=TRUE, echo=TRUE}
-suppressWarnings(suppressMessages(library(pROC)))
-library (pROC)
-prob_p_alto= predict(modelo_logistico_2, diamonds_df, type="response")
-g= roc(diamonds_df$PA, prob_p_alto, data=diamonds_df)
-plot (g)
-auc (g)
-```
-
-El área bajo la curva es de 0.88, es un valor bastante alto. Por lo tanto podemos afirmar que el precio alto está ligado a un volumen alto y peso alto.
 Intentaremos predecir la probabilidad de tener un precio alto, si el peso y el volumen son altos
 
 ```{r,eval=TRUE, echo=TRUE}
@@ -837,6 +830,16 @@ predict (modelo_logistico_2, df_2 ,type="response")
 ```
 
 Nos da una probabilidad de un 82% de que si el volumen y el peso son altos, el precio también será alto.
+
+Realizamos el test de Hoslem para ver el nivel de asjute
+```{r}
+suppressWarnings(suppressMessages(library(ResourceSelection)))
+library(ResourceSelection)
+hoslem.test(diamonds_df$PA, fitted(modelo_logistico_2))
+```
+
+El test de Hoslem nos da un p-valor de 1, indica que el modelo está muy bien ajustado
+
 Finalmente utilizaremos un modelo de validación cruzada para evaluar si tenemos muchos errores o no en el modelo.
 Para ello, aplicaremos el modelo Leave One Out Cross Validation (LOOCV)
 
@@ -891,16 +894,7 @@ model.tree
 #Reglas aplicadas
 rpart.rules(model.tree)
 ```
-
-Representamos el árbol, para hacernos una idea:
-
-```{r}
-rpart.plot(model.tree)
-```
-
-El problema es que como las variables "Peso" y "Volumen" tenían tanta relación entre ellas, el algoritmo sólo está tomando una de ellas, ya que las reglas serían parecidas para ambas variables.
-
-Vamos a comprobar la bondad del árbol de clasificación utilizando los datos de test que habíamos reservado y los comparamos con los orignales mediante una matriz de confusión.
+También comprobamos la bondad del modelo del árbol de clasificación utilizando los datos de test que habíamos reservado y los comparamos con los orignales mediante una matriz de confusión.
 
 ```{r}
 suppressWarnings(suppressMessages(library(caret)))
@@ -911,7 +905,67 @@ confusionMatrix(prediccion_1, diamonds_test[["cuartil.price"]])
 
 Podemos observar que tenemos muy buenos valores de "Accuracy" y "Kappa".
 
+
 ## 5. Representación de los resultados a partir de tablas y gráficas. 
+### Correlaciones
+En primer lugar, antes de realizar medimos la correlación de las distintas variables del dataset para ver qué variables son susceptibles de ser estudiadas y también la relación que hay entre ellas
+```{r}
+ggplot(data = m.corr.mat, aes(Var2, Var1, fill = value))+
+ geom_tile(color = "white")+
+ scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+   midpoint = 0, limit = c(-1,1), space = "Lab", 
+   name="Pearson\nCorrelation") +
+  theme_minimal()+ 
+ theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+    size = 12, hjust = 1))+
+ coord_fixed()
+```
+
+
+### Regresiones
+Hemos realizado modelos de regresión lineal y logístico para intentar predecir el precio de mercado de un diamante según sus características.
+En el modelo lineal, elegimos como primer modelo solo la variable volume y posteriormente fuimos adaptando el modelo, añadiendo nuevas variables hasta conseguir el modelo final.
+
+El modelo final contiene la combinación de las características: carat+volume+clarity+color, este modelo nos muestra ya de por si más un 90% de la variabilidad de los datos
+
+```{r}
+library(knitr)
+options (knitr.kable.NA = '')
+kable( modelos_text[,c("variables","r_squared")],digits=2,caption="Modelos lineales" )
+
+
+```
+
+Con respecto al modelo logístico, intentamos ver si somos capacacer de predecir si un diamante es caro o no si el volumen o peso del mismo son altos.
+
+```{r}
+modelo_logistico_2 <- glm(formula=PA~CA+VA , data = diamonds_df, family = "binomial")
+```
+El ajuste del modelo es bueno, pero para poder demostrar si es correcto, dibujamos la curva ROC para evaluar la calidad del ajuste
+
+```{r,eval=TRUE, echo=TRUE}
+suppressWarnings(suppressMessages(library(pROC)))
+library (pROC)
+prob_p_alto= predict(modelo_logistico_2, diamonds_df, type="response")
+g= roc(diamonds_df$PA, prob_p_alto, data=diamonds_df)
+plot (g)
+auc (g)
+```
+
+El área bajo la curva es de 0.88, es un valor bastante alto. Por lo tanto podemos afirmar que el precio alto está ligado a un volumen alto y peso alto.
+
+
+### Arbol de decisión
+
+Intentamos predecir la cateoría del precio del diamante según el volumen / carat del mismo.
+Para ello construimos un modelo basado en un árbol de clasificación, la representación del modelo es
+
+```{r}
+rpart.plot(model.tree)
+
+```
+
+
 
 ## 6. Resolución  del  problema.  A  partir  de  los  resultados  obtenidos,  ¿cuáles  son  las conclusiones? ¿Los resultados permiten responder al problema? 
 

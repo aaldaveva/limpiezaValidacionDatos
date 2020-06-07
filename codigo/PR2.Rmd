@@ -1,5 +1,5 @@
 ---
-title: 'Practica 2: Limpieza y validación de los datos'
+title: 'Práctica 2: Limpieza y validación de los datos'
 author: "Anddy Aldave Valle, Alejandro Pulido Duque"
 date: "9 de Junio de 2020"
 subtitle: "Esta práctica se encuentra alojada en https://github.com/aaldaveva/limpiezaValidacionDatos"

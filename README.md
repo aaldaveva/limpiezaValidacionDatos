@@ -13,6 +13,7 @@
           <li>diamonds_processed.csv: set de datos generado después del análisis</li>
           <li>carpeta codigo: PR2.rmd: código en R creado para el análisis de los datos en formato markdown</li>
           <li>carpeta documentacion: contiene 2 ficheros: PRD2.html: informe dinámico en formato markdown HTML generado tras el análisis, incluyendo todas las conclusiones y procedimientos y PR2.pdf: informe anterior en formato PDF</li>
+           <li>images: diamante.jpg: contiene la imagen del diamante</li>
 </ul>
 
 <p><h2>Desarrollo:  </h2></p>

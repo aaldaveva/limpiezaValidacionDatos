@@ -47,7 +47,16 @@ Además, se añadirá un atributo secundario que facilitará el análisis. Este 
 
 A continuación, para mayor claridad, se incluyen las partes del diamante, que nos ayudará a localizar los atributos de medida (Altura, Tabla, X, Y, Z)
 
-![Partes del diamante](diamante.JPG)
+```{r}
+library(jpeg)
+library(RCurl)
+
+x <- "https://raw.githubusercontent.com/aaldaveva/limpiezaValidacionDatos/master/images/diamante.JPG"    
+
+imagen.diamond<-readJPEG(getURLContent(x))
+plot(0:1,0:1,type="n",ann=FALSE,axes=FALSE)
+rasterImage(imagen.diamond,0,0,1,1)
+```
 
 Resulta interesante desde un punto de vista de la limpieza y el análisis de los datos obtenidos.
 En primer lugar, nos permite ejecutar ciertas tareas de limpieza para adecuar los datos a un posterior análisis exhaustivo de las variables.

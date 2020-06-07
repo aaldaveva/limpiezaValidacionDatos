@@ -3,8 +3,8 @@ title: 'Practica 2: Limpieza y validación de los datos'
 author: "Anddy Aldave Valle, Alejandro Pulido Duque"
 date: "9 de Junio de 2020"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -912,7 +912,7 @@ A modo de resumen, se han modificado / añadido las siguientes variables:
 
 ### Correlaciones
 
-En primer lugar, antes de realizar medimos la correlación de las distintas variables del dataset para ver qué variables son susceptibles de ser estudiadas y también la relación que hay entre ellas, dejamos representada el mapa de calor de las diferentes variables numéricas mediante el test de Spearman:
+En primer lugar, antes de realizar el análisis medimos la correlación de las distintas variables del dataset para ver qué variables son susceptibles de ser estudiadas y también la relación que hay entre ellas, dejamos representada el mapa de calor de las diferentes variables numéricas mediante el test de Spearman:
 
 ```{r}
 ggplot(data = m.corr.mat, aes(Var2, Var1, fill = value))+

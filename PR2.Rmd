@@ -3,8 +3,8 @@ title: 'Practica 2: Limpieza y validación de los datos'
 author: "Anddy Aldave Valle, Alejandro Pulido Duque"
 date: "9 de Junio de 2020"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}

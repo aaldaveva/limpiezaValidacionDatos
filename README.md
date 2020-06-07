@@ -21,8 +21,8 @@
 <ul><li>carat: Peso del diamante</li><li>cut: Calidad subjetiva del corte</li><li>color: Color del diamante</li><li>clarity: Claridad o transparencia del diamante</li><li>depth: Altura del diamante</li><li>table: Anchura del diamante</li><li>price: Precio</li><li>x: Longitud del diamante</li><li>y: Ancho del diamante</li><li>z: Profundiad del diamante</li></ul>
 
 <p><h2>Ficheros:  </h2></p>
-<ul><li>src: Contiene el código R.</li>
-    <li>codigo: Código fuente del programa, realizado en R en formato markdown</li>
+<ul><li>codigo: Código fuente del programa, realizado en R en formato markdown</li>
     <li>documentación:Contiene nuestras respuestas a la práctica.</li>
-    <li>csv: Contiene los ficheros diamonds.csv (fichero original) y diamonds_processed.csv (contiene los cambios realizados)</li>
+    <li>diamonds.csv: fichero de datos original)</li>
+    <li>diamonds_processed.csv: contiene los cambios realizados</li>
 </ul>

@@ -3,8 +3,8 @@ title: 'Practica 2: Limpieza y validación de los datos'
 author: "Anddy Aldave Valle, Alejandro Pulido Duque"
 date: "9 de Junio de 2020"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -605,41 +605,8 @@ pairs.panels(diamonds_df[,c(11,1)], ellipses = FALSE, lm=TRUE, method = "spearma
 
 Vemos que la correlación entre el Precio y el Peso, y entre el Precio y su volumen es bastante alta.
 
-__Kendall Tau__
 
-Del mismo modo que la Spearman, la correlación de Kendall-Tau se basa en rangos.
-
-# Descomentar para generar el PDF y el HTML, luego volver a comentar!
-# ```{r}
-# library (reshape2, warn.conflicts = FALSE)
-# library(ggplot2)
-# #Creamos una matriz de correlación con los datos descritos
-# corr.mat<-round(cor(diamonds_df[,c(7,1,5,6,11)], method = "kendall"),2)
-# #Visualizams los datos mediante un mapa de calor
-# corr.mat[lower.tri(corr.mat)]<- NA
-# m.corr.mat<-melt(corr.mat, na.rm=TRUE)
-# # Fuente: http://www.sthda.com/english/wiki/ggplot2-quick-correlation-matrix-heatmap-r-software-and-data-visualization
-# ggplot(data = m.corr.mat, aes(Var2, Var1, fill = value))+
-#  geom_tile(color = "white")+
-#  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
-#    midpoint = 0, limit = c(-1,1), space = "Lab", 
-#    name="Pearson\nCorrelation") +
-#   theme_minimal()+ 
-#  theme(axis.text.x = element_text(angle = 45, vjust = 1, 
-#     size = 12, hjust = 1))+
-#  coord_fixed()
-# ```
-
-Vemos su índice de correlación
- 
-# ```{r}
-# library(psych)
-# pairs.panels(diamonds_df[,c(7,11)], ellipses = FALSE, lm=TRUE, method = "kendall")
-# pairs.panels(diamonds_df[,c(7,1)], ellipses = FALSE, lm=TRUE, method = "kendall")
-# pairs.panels(diamonds_df[,c(11,1)], ellipses = FALSE, lm=TRUE, method = "kendall")
-# ```
-
-Obteniendo básicamente los mismos resultados para los dos análisis:
+Los resulados del análisis son:
 
 * Precio y Peso están altamente relacionados
 * Precio y Volumen están altamente relacionados

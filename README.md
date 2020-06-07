@@ -19,7 +19,7 @@
 <p><h2>Desarrollo:  </h2></p>
 <p>La práctica la hemos desarrollado en R. Para su correcta ejecución, se necesita instalar las siguientes librerías:</p>
 <ul><li>install.packages("dplyr")</li><li>install.packages("boot")</li><li>install.packages("knitr")</li>
-<li>install.packages("VIM")</li><li>install.packages("reshape2")</li><li>install.packages("ggplot2")</li><li>install.packages("psych")</li><li>install.packages("arules")</li><li>install.packages("rcompanion")</li><li>install.packages("ResourceSelection")</li><li>install.packages("pROC")</li><li>install.packages("tidyverse")</li><li>install.packages("rpart")</li><li>install.packages("rpart.plot")</li><li>install.packages("faraway")</li><li>install.packages("caret")</li>
+<li>install.packages("VIM")</li><li>install.packages("reshape2")</li><li>install.packages("ggplot2")</li><li>install.packages("psych")</li><li>install.packages("arules")</li><li>install.packages("rcompanion")</li><li>install.packages("ResourceSelection")</li><li>install.packages("pROC")</li><li>install.packages("tidyverse")</li><li>install.packages("rpart")</li><li>install.packages("rpart.plot")</li><li>install.packages("faraway")</li><li>install.packages("caret")</li><li>install.packages("jpeg")</li><li>install.packages("RCurl")</li>
 </ul>
 
 <p><h2>Atributos presentes en el set de datos original:  </h2></p>

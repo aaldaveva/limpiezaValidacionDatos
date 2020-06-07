@@ -19,3 +19,10 @@
 <p><h2>Atributos presentes en el set de datos original:  </h2></p>
 <p>El análisis se ha basado en los siguientes atributos presentes en el set de datos original:</p>
 <ul><li>carat: Peso del diamante</li><li>cut: Calidad subjetiva del corte</li><li>color: Color del diamante</li><li>clarity: Claridad o transparencia del diamante</li><li>depth: Altura del diamante</li><li>table: Anchura del diamante</li><li>price: Precio</li><li>x: Longitud del diamante</li><li>y: Ancho del diamante</li><li>z: Profundiad del diamante</li></ul>
+
+<p><h2>Ficheros:  </h2></p>
+<ul><li>src: Contiene el código R.</li>
+    <li>codigo: Código fuente del programa, realizado en R en formato markdown</li>
+    <li>documentación:Contiene nuestras respuestas a la práctica.</li>
+    <li>csv: Contiene los ficheros diamonds.csv (fichero original) y diamonds_processed.csv (contiene los cambios realizados)</li>
+</ul>

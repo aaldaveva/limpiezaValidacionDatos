@@ -22,7 +22,7 @@
 
 <p><h2>Ficheros:  </h2></p>
 <ul><li>codigo: Código fuente del programa, realizado en R en formato markdown</li>
-    <li>documentación:Contiene nuestras respuestas a la práctica.</li>
-    <li>diamonds.csv: fichero de datos original)</li>
-    <li>diamonds_processed.csv: contiene los cambios realizados</li>
+    <li>documentación: Contiene nuestras respuestas a la práctica.</li>
+    <li>diamonds.csv: Fichero de datos original</li>
+    <li>diamonds_processed.csv: Contiene los cambios realizados</li>
 </ul>

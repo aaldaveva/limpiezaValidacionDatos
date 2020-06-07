@@ -17,6 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 El dataset "Diamonds" ha sido descargado de Kaggle, cuya licencia es _desconocida_ tal y como indica el mismo.
 
 >Este Set de datos puede ser descargado de: https://www.kaggle.com/shivam2503/diamonds 
+
 El set de datos contiene 53940 registros de diamantes.
 Para cada registro, los campos del conjunto de datos son los siguientes
 
